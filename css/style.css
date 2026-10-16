@@ -287,30 +287,33 @@ canvas {
 
 .ctrl {
   display: flex;
-  gap: 10px;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
-}
-
-.ctrl .lr {
-  display: flex;
-  gap: 10px;
-}
-
-.ctrl button {
-  min-width: 76px;
-  min-height: 52px;
-  font-size: 20px;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
+  margin-top: 4px;
 }
 
 .ctrl .act {
-  flex: 1;
-  max-width: 260px;
+  width: 100%;
+  max-width: 320px;
+  min-height: 48px;
   font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: var(--amber);
+  color: #1a1205;
+  border-color: #8c6720;
+  box-shadow: 0 4px 0 #593f0e;
+  border-radius: 6px;
+}
+
+.ctrl .act:hover {
+  background: #f7cd72;
+  border-color: #d4a537;
+}
+
+.ctrl .act:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #593f0e;
 }
 
 .keys {
