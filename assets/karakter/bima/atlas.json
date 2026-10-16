@@ -1,0 +1,56 @@
+{
+  "character": "bima",
+  "frame_width": 64,
+  "frame_height": 64,
+  "facing": "right",
+  "animations": {
+    "idle": {
+      "row": 0,
+      "frames": 4,
+      "fps": 6,
+      "loop": true
+    },
+    "walk": {
+      "row": 1,
+      "frames": 6,
+      "fps": 10,
+      "loop": true
+    },
+    "run": {
+      "row": 2,
+      "frames": 6,
+      "fps": 14,
+      "loop": true
+    },
+    "jump": {
+      "row": 3,
+      "frames": 4,
+      "fps": 8,
+      "loop": false
+    },
+    "land": {
+      "row": 4,
+      "frames": 2,
+      "fps": 10,
+      "loop": false
+    },
+    "crouch": {
+      "row": 5,
+      "frames": 2,
+      "fps": 6,
+      "loop": true
+    },
+    "hurt": {
+      "row": 6,
+      "frames": 2,
+      "fps": 8,
+      "loop": false
+    },
+    "talk": {
+      "row": 7,
+      "frames": 4,
+      "fps": 6,
+      "loop": true
+    }
+  }
+}

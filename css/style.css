@@ -358,6 +358,100 @@ canvas {
   gap: 12px;
 }
 
+.title-card {
+  max-width: 660px;
+  text-align: center;
+}
+
+.title-banner {
+  position: relative;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 2px solid var(--line);
+  background: #06040a;
+  aspect-ratio: 16/9;
+}
+
+.title-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.title-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 72%;
+  max-width: 320px;
+  height: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.95));
+}
+
+.title-actions {
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.btn-pixel-mulai {
+  width: 160px;
+  height: 30px;
+  display: inline-block;
+  background: url('../assets/menu/tombol/tombol_mulai_besar_normal.png') no-repeat center / contain;
+  border: none;
+  cursor: pointer;
+  image-rendering: pixelated;
+  transform: scale(1.45);
+  transform-origin: center center;
+  margin: 10px 0 6px 0;
+  box-shadow: none;
+  transition: transform 0.08s ease;
+}
+
+.btn-pixel-mulai:hover {
+  background-image: url('../assets/menu/tombol/tombol_mulai_besar_hover.png');
+  transform: scale(1.48);
+}
+
+.btn-pixel-mulai:active {
+  background-image: url('../assets/menu/tombol/tombol_mulai_besar_ditekan.png');
+  transform: scale(1.42) translateY(2px);
+}
+
+.btn-pixel-mulai:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+}
+
+.chapter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.chapter-overlay img {
+  max-width: 92vw;
+  max-height: 85vh;
+  image-rendering: pixelated;
+  aspect-ratio: 16/9;
+  object-fit: contain;
+}
+
+.chapter-overlay.out {
+  opacity: 0;
+}
+
 .card h2 {
   font-family: var(--f-display);
   margin: 0;

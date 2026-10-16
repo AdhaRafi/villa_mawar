@@ -341,40 +341,42 @@
   /* ---------- cerita ---------- */
   function setTime(t) { S.time = t; updHud(); }
   function intro() {
-    S.started = true; S.room = 'dapur'; S.memory = true; setTime('19.00'); S.f.v_dapur = true;
-    say([['', 'Villa Mawar, 19.00. Makan malam. Hujan sudah turun sejak sore.'],
-    ['Pak Arga', 'Terima kasih sudah datang. Besok pagi ada keputusan penting soal keuangan Mawar Karya, dan soal villa ini.'],
-    ['Naya', 'Soal villa? Paman tidak berhak menjualnya! Itu rumah Ibu!', 'terkejut'],
-    ['', 'Naya meninggalkan meja. Bima, direktur keuangan Mawar Karya, berhenti mengaduk kopinya. Pantofel hitamnya mengilap di bawah lampu.'],
-    ['Bima', 'Arga, bicarakan nanti saja. Jangan di depan tamu.'],
-    ['', 'Raka, yang diperkenalkan sebagai “teman lama”, hanya mengamati. Pukul 20.00 longsor menutup jalan. Sinyal telepon ikut lenyap.']
-    ], function () {
-      S.memory = false; S.room = 'aula'; S.x = 96; S.f.v_aula = true; S.fade = 1; setTime('20.55');
-      S.sari = { x: 150 };
-      say([['', 'Aula Villa Mawar. Hujan menghantam jendela. Sari datang membawa nampan.'],
-      ['Sari', 'Teh hangat untuk Bapak. Satu lagi untuk Pak Arga di ruang musik. Beliau minta tidak diganggu.'],
-      ['Raka', 'Terima kasih, Sari. Kau kelihatan pucat.'],
-      ['Sari', 'Cuma hujannya, Pak. ... Bapak benar-benar hanya teman lama Pak Arga?'],
-      ['Raka', 'Kenapa kau bertanya?'],
-      ['Sari', 'Beliau pernah bilang, kalau ada apa-apa saya boleh percaya pada Bapak. Permisi.', 'terpejam'],
-      function () { S.sari = null; setTime('21.00'); S.callOn = true; if (typeof GameAudio !== 'undefined') GameAudio.clockChime(9); },
-      ['', 'Jam di Ruang Musik berdentang sembilan kali. Interkom berdering.'],
-      ['Dimas (interkom)', 'Dimas dari pos jaga, Pak. Longsor kedua di tikungan dua. Mobil tidak akan bisa lewat sampai subuh.'],
-      ['Raka', 'Kau tetap di pos?'],
-      ['Dimas (interkom)', 'Siap. Saya pantau sampai air surut. Nanti saya telepon lagi.'],
-      function () { addEv('B1'); S.callOn = false; },
-      function () { setTime('21.14'); S.callOn = true; },
-      ['', 'Interkom berdering lagi.'],
-      ['Dimas (interkom)', 'Pak, tikungan satu ikut longsor. Saya masih di pos.'],
-      function () { S.callOn = false; if (typeof GameAudio !== 'undefined') GameAudio.clockChime(1); },
-      ['', 'Dari ruang sebelah, jam berdentang sekali. Seperempat lewat sembilan. Raka kembali ke kamarnya dan membaca.'],
-      function () { addEv('B2'); setTime('22.05'); S.x = 96; },
-      ['', '22.05. Sebuah teriakan memecah malam, dari arah Ruang Musik.'],
-      ['Raka', 'Naya!', 'terkejut'],
-      function () { S.f.discovered = true; S.f.intro_done = true; S.fade = 1; },
-      ['', 'Satu per satu penghuni berkumpul di Aula. Raka mengungkap jati dirinya: seorang detektif, diundang Pak Arga. Tak seorang pun boleh meninggalkan villa.'],
-      ['Raka', 'Aku akan memeriksa Ruang Musik. Jangan ada yang menyentuh apa pun.']
-      ], function () { toast('Buka Catatan untuk melihat bukti dan aturan sandi'); updHud(); });
+    showChapter(1, function () {
+      S.started = true; S.room = 'dapur'; S.memory = true; setTime('19.00'); S.f.v_dapur = true;
+      say([['', 'Villa Mawar, 19.00. Makan malam. Hujan sudah turun sejak sore.'],
+      ['Pak Arga', 'Terima kasih sudah datang. Besok pagi ada keputusan penting soal keuangan Mawar Karya, dan soal villa ini.'],
+      ['Naya', 'Soal villa? Paman tidak berhak menjualnya! Itu rumah Ibu!', 'terkejut'],
+      ['', 'Naya meninggalkan meja. Bima, direktur keuangan Mawar Karya, berhenti mengaduk kopinya. Pantofel hitamnya mengilap di bawah lampu.'],
+      ['Bima', 'Arga, bicarakan nanti saja. Jangan di depan tamu.'],
+      ['', 'Raka, yang diperkenalkan sebagai “teman lama”, hanya mengamati. Pukul 20.00 longsor menutup jalan. Sinyal telepon ikut lenyap.']
+      ], function () {
+        S.memory = false; S.room = 'aula'; S.x = 96; S.f.v_aula = true; S.fade = 1; setTime('20.55');
+        S.sari = { x: 150 };
+        say([['', 'Aula Villa Mawar. Hujan menghantam jendela. Sari datang membawa nampan.'],
+        ['Sari', 'Teh hangat untuk Bapak. Satu lagi untuk Pak Arga di ruang musik. Beliau minta tidak diganggu.'],
+        ['Raka', 'Terima kasih, Sari. Kau kelihatan pucat.'],
+        ['Sari', 'Cuma hujannya, Pak. ... Bapak benar-benar hanya teman lama Pak Arga?'],
+        ['Raka', 'Kenapa kau bertanya?'],
+        ['Sari', 'Beliau pernah bilang, kalau ada apa-apa saya boleh percaya pada Bapak. Permisi.', 'terpejam'],
+        function () { S.sari = null; setTime('21.00'); S.callOn = true; if (typeof GameAudio !== 'undefined') GameAudio.clockChime(9); },
+        ['', 'Jam di Ruang Musik berdentang sembilan kali. Interkom berdering.'],
+        ['Dimas (interkom)', 'Dimas dari pos jaga, Pak. Longsor kedua di tikungan dua. Mobil tidak akan bisa lewat sampai subuh.'],
+        ['Raka', 'Kau tetap di pos?'],
+        ['Dimas (interkom)', 'Siap. Saya pantau sampai air surut. Nanti saya telepon lagi.'],
+        function () { addEv('B1'); S.callOn = false; },
+        function () { setTime('21.14'); S.callOn = true; },
+        ['', 'Interkom berdering lagi.'],
+        ['Dimas (interkom)', 'Pak, tikungan satu ikut longsor. Saya masih di pos.'],
+        function () { S.callOn = false; if (typeof GameAudio !== 'undefined') GameAudio.clockChime(1); },
+        ['', 'Dari ruang sebelah, jam berdentang sekali. Seperempat lewat sembilan. Raka kembali ke kamarnya dan membaca.'],
+        function () { addEv('B2'); setTime('22.05'); S.x = 96; },
+        ['', '22.05. Sebuah teriakan memecah malam, dari arah Ruang Musik.'],
+        ['Raka', 'Naya!', 'terkejut'],
+        function () { S.f.discovered = true; S.f.intro_done = true; S.fade = 1; showChapter(2); },
+        ['', 'Satu per satu penghuni berkumpul di Aula. Raka mengungkap jati dirinya: seorang detektif, diundang Pak Arga. Tak seorang pun boleh meninggalkan villa.'],
+        ['Raka', 'Aku akan memeriksa Ruang Musik. Jangan ada yang menyentuh apa pun.']
+        ], function () { toast('Buka Catatan untuk melihat bukti dan aturan sandi'); updHud(); });
+      });
     });
   }
   S.f.intro_done = false;
@@ -627,13 +629,15 @@
     var res = PIL.map(function (pl, i) { var a = BD.place[i][0], b = BD.place[i][1]; return !!(a && b && a !== b && pl.v.indexOf(a) >= 0 && pl.v.indexOf(b) >= 0); });
     var n = res.filter(Boolean).length;
     $('mBoard').hidden = true;
-    ending(n >= 4 ? 'win' : (n >= 2 ? 'weak' : 'wrong'), 'Bima', res);
+    showChapter(6, function () {
+      ending(n >= 4 ? 'win' : (n >= 2 ? 'weak' : 'wrong'), 'Bima', res);
+    });
   }
   var ENDS = {
-    win: { t: 'Sandi Terakhir', tag: 'Akhir 1 · Kebenaran terungkap', bg: 'bg_ruang_musik_subuh' },
-    weak: { t: 'Bukti yang Tipis', tag: 'Akhir 2 · Kasus menggantung', bg: 'bg_ruang_musik_subuh' },
-    wrong: { t: 'Mawar yang Salah', tag: 'Akhir 3 · Salah menuduh', bg: 'bg_ruang_musik_subuh' },
-    rush: { t: 'Terlalu Cepat', tag: 'Akhir 3 · Salah menuduh', bg: 'bg_gudang' }
+    win: { t: 'Sandi Terakhir', tag: 'Akhir 1 · Kebenaran terungkap', bg: 'ending_1' },
+    weak: { t: 'Bukti yang Tipis', tag: 'Akhir 2 · Kasus menggantung', bg: 'ending_2' },
+    wrong: { t: 'Mawar yang Salah', tag: 'Akhir 3 · Salah menuduh', bg: 'ending_3' },
+    rush: { t: 'Terlalu Cepat', tag: 'Akhir 3 · Salah menuduh', bg: 'ending_3' }
   };
   function ending(kind, who, res) {
     S.ending = kind; dlg.Q = []; dlg.active = false; setDlgIdle();
@@ -856,6 +860,39 @@
   }
 
   /* ---------- mulai ---------- */
+  var titleFlashTimer = null;
+  function startTitleFlash() {
+    if (titleFlashTimer) return;
+    titleFlashTimer = setInterval(function () {
+      var tImg = $('titleImg');
+      if (!tImg || $('mTitle').hidden) return;
+      if (Math.random() < 0.4) {
+        tImg.src = ASSETS.menu_bg_kilat || 'assets/menu/layar/latar_menu_utama_kilat.png';
+        if (typeof GameAudio !== 'undefined' && !$('mTitle').hidden) GameAudio.thunder();
+        setTimeout(function () {
+          if (tImg) tImg.src = ASSETS.menu_bg || 'assets/menu/layar/latar_menu_utama.png';
+        }, 90);
+      }
+    }, 4500);
+  }
+
+  function showChapter(num, callback) {
+    var k = 'chapter_' + num;
+    var src = ASSETS[k];
+    if (!src) { if (callback) callback(); return; }
+    var overlay = document.createElement('div');
+    overlay.className = 'chapter-overlay';
+    overlay.innerHTML = '<img src="' + src + '" alt="Bab ' + num + '">';
+    document.body.appendChild(overlay);
+    setTimeout(function () {
+      overlay.classList.add('out');
+      setTimeout(function () {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        if (callback) callback();
+      }, 350);
+    }, 1500);
+  }
+
   var bAud = $('bAudio');
   if (bAud && typeof GameAudio !== 'undefined') {
     bAud.addEventListener('click', function () {
@@ -866,9 +903,16 @@
   }
   $('bStart').addEventListener('click', function () {
     if (typeof GameAudio !== 'undefined') GameAudio.start();
-    $('mTitle').hidden = true; updNote(); intro();
+    $('mTitle').hidden = true;
+    if (titleFlashTimer) { clearInterval(titleFlashTimer); titleFlashTimer = null; }
+    updNote(); intro();
   });
   setDlgIdle(); updHud();
-  loadAll().then(function () { $('titleImg').src = ASSETS.bg_aula; requestAnimationFrame(frame); });
+  loadAll().then(function () {
+    var tImg = $('titleImg');
+    if (tImg) tImg.src = ASSETS.menu_bg || 'assets/menu/layar/latar_menu_utama.png';
+    startTitleFlash();
+    requestAnimationFrame(frame);
+  });
   window.__g = { S: function () { return S; }, say: say, go: go, addEv: addEv, openPuz: openPuz, finale: finale, openBoard: openBoard, ending: ending, PUZ: PUZ, enc: enc, IM: IM };
 })();
