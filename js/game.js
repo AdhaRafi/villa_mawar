@@ -67,13 +67,22 @@
   }
   function nameTag(x, t, col) { ctx.font = '7px "Pixelify Sans","Courier New",monospace'; ctx.textAlign = 'center'; ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,0,0,.85)'; ctx.strokeText(t, x, FEET - 60); ctx.fillStyle = col; ctx.fillText(t, x, FEET - 60); }
 
+  /* ---------- modal helper ---------- */
+  function isModalOpen() {
+    return !$('mTitle').hidden ||
+      !$('mHelp').hidden ||
+      !$('mNote').hidden ||
+      !$('mPuz').hidden ||
+      !$('mBoard').hidden ||
+      !$('mEnd').hidden;
+  }
+
   /* ---------- state ---------- */
   var S;
   function newState() { S = { room: 'aula', x: 100, face: 1, f: {}, ev: {}, seen: {}, time: '--.--', fade: 0, flash: 0, flashT: 5, fb: null, t: 0, started: false, pose: null, spk: null, noteT: 0, sari: null, callOn: false, memory: false, dawn: false, ending: null }; }
   newState();
   var keys = { l: false, r: false };
   var dlg = { active: false, Q: [], done: null, opts: false, typing: false };
-  var modalOpen = 0;
 
   /* ---------- bukti ---------- */
   var EVD = {
@@ -142,6 +151,7 @@
   }
   function advance() { if (!dlg.active || dlg.opts) return; if (dlg.typing) { finishType(); return; } nextLine(); }
   $('dlg').addEventListener('click', advance);
+  cv.addEventListener('click', act);
   function say2(l) { dlg.Q = l.concat(dlg.Q); }
 
   /* ---------- peta ---------- */
@@ -444,11 +454,20 @@
     var row = document.createElement('div'); row.className = 'row';
     var hb = document.createElement('button'); hb.type = 'button'; hb.id = 'hintBtn'; hb.textContent = 'Petunjuk (0/3)';
     hb.addEventListener('click', function () { if (curP.hint >= 3) return; curP.hint++; hb.textContent = 'Petunjuk (' + curP.hint + '/3)'; hint.innerHTML += '<p>' + curP.hint + '. ' + P.hints[curP.hint - 1] + '</p>'; if (curP.id === 'p2' && curP.hint >= 2) showVf(); });
-    var cl = document.createElement('button'); cl.type = 'button'; cl.textContent = 'Simpan dan tutup'; cl.addEventListener('click', function () { $('mPuz').hidden = true; modalOpen--; });
+    var cl = document.createElement('button'); cl.type = 'button'; cl.textContent = 'Simpan dan tutup'; cl.addEventListener('click', function () { $('mPuz').hidden = true; });
     row.appendChild(hb); row.appendChild(cl); c.appendChild(row); c.appendChild(hint);
-    $('mPuz').hidden = false; modalOpen++;
+    $('mPuz').hidden = false;
   }
-  function parseNum(s) { s = String(s).replace(/[−–]/g, '-').trim(); if (!/^-?\d+$/.test(s)) return null; return parseInt(s, 10); }
+  function parseNum(s) {
+    s = String(s).replace(/[−–—]/g, '-').trim();
+    if (!/^-?\d+$/.test(s)) {
+      if (s.length === 1 && ((s >= 'A' && s <= 'Z') || (s >= 'a' && s <= 'z') || s === ' ')) {
+        return val(s);
+      }
+      return null;
+    }
+    return parseInt(s, 10);
+  }
   function showVf() { curP.vf = true; Array.prototype.forEach.call(document.querySelectorAll('#cipher .chip'), function (c) { var inp = c.querySelector('input'); if (inp.value) chk(c, +c.dataset.i); }); }
   function chk(chip, i) {
     var P = curP.P, inp = chip.querySelector('input'), x = parseNum(inp.value), ch = chip.querySelector('.ch'), vf = chip.querySelector('.vf');
@@ -468,7 +487,7 @@
       curP.solved = true; var r = $('puzRes'); r.className = 'solved';
       r.innerHTML = '<div class="muted">Pesan terbuka</div><div class="msg"></div>'; r.querySelector('.msg').textContent = '“' + curP.P.msg + '”';
       var b = document.createElement('button'); b.type = 'button'; b.className = 'primary'; b.textContent = 'Lanjutkan'; b.style.marginTop = '10px';
-      b.addEventListener('click', function () { $('mPuz').hidden = true; modalOpen--; var id = curP.id; if (id === 'p1') afterP1(); else afterP2(); });
+      b.addEventListener('click', function () { $('mPuz').hidden = true; var id = curP.id; if (id === 'p1') afterP1(); else afterP2(); });
       r.appendChild(b);
     }
   }
@@ -512,12 +531,14 @@
     c.appendChild(l);
     var r = document.createElement('div'); r.className = 'row'; var b = document.createElement('button'); b.type = 'button'; b.textContent = 'Tutup'; b.addEventListener('click', closeNote); r.appendChild(b); c.appendChild(r);
   }
-  function openNote() { if (!S.started) return; renderNote(); $('mNote').hidden = false; modalOpen++; }
-  function closeNote() { if ($('mNote').hidden) return; $('mNote').hidden = true; modalOpen--; }
+  function openNote() { if (!S.started) return; renderNote(); $('mNote').hidden = false; }
+  function closeNote() { if ($('mNote').hidden) return; $('mNote').hidden = true; }
   $('bNote').addEventListener('click', function () { if ($('mNote').hidden) openNote(); else closeNote(); });
   $('bHelp').addEventListener('click', function () {
+    if (!$('mHelp').hidden) { $('mHelp').hidden = true; return; }
     var c = $('helpCard'); c.innerHTML = '<h2>Cara bermain</h2><div class="list"><p>Berjalan ke kiri dan kanan. Dekati benda bertanda lup, pintu, atau orang, lalu tekan <b>Periksa</b>.</p><p>Bukti masuk otomatis ke <b>Catatan</b>. Bicaralah dengan semua orang, periksa semua ruangan, dan jangan percaya satu bukti saja.</p><p>Dua sandi akan muncul. Anda cukup membalik fungsi pada tiap angka. Kalkulator dan petunjuk disediakan.</p><p>Di akhir, Anda menyusun lima kesimpulan di Papan Bukti, masing-masing dengan dua bukti yang tepat. Semakin kuat, semakin baik akhir ceritanya.</p></div><div class="row"><button type="button" id="hx">Tutup</button></div>';
-    $('mHelp').hidden = false; modalOpen++; $('hx').addEventListener('click', function () { $('mHelp').hidden = true; modalOpen--; });
+    $('mHelp').hidden = false;
+    $('hx').addEventListener('click', function () { $('mHelp').hidden = true; });
   });
 
   /* ---------- papan bukti dan akhir ---------- */
@@ -573,15 +594,15 @@
     c.appendChild(kl);
     var r = document.createElement('div'); r.className = 'row';
     var go1 = document.createElement('button'); go1.type = 'button'; go1.className = 'primary'; go1.textContent = 'Ajukan tuduhan'; go1.addEventListener('click', submitBoard);
-    var bk = document.createElement('button'); bk.type = 'button'; bk.textContent = 'Kembali menyelidiki'; bk.addEventListener('click', function () { $('mBoard').hidden = true; modalOpen--; S.f.ready = true; });
+    var bk = document.createElement('button'); bk.type = 'button'; bk.textContent = 'Kembali menyelidiki'; bk.addEventListener('click', function () { $('mBoard').hidden = true; S.f.ready = true; });
     r.appendChild(go1); r.appendChild(bk); c.appendChild(r);
     renderBoard();
-    $('mBoard').hidden = false; modalOpen++;
+    $('mBoard').hidden = false;
   }
   function submitBoard() {
     var res = PIL.map(function (pl, i) { var a = BD.place[i][0], b = BD.place[i][1]; return !!(a && b && a !== b && pl.v.indexOf(a) >= 0 && pl.v.indexOf(b) >= 0); });
     var n = res.filter(Boolean).length;
-    $('mBoard').hidden = true; modalOpen--;
+    $('mBoard').hidden = true;
     ending(n >= 4 ? 'win' : (n >= 2 ? 'weak' : 'wrong'), 'Bima', res);
   }
   var ENDS = {
@@ -624,12 +645,12 @@
       res.forEach(function (ok, i) { var d = document.createElement('div'); d.className = 'res-line ' + (ok ? 'y' : 'n'); d.textContent = (ok ? '✓ ' : '✗ ') + PIL[i].t; rl.appendChild(d); }); eb.appendChild(rl);
     }
     var r = document.createElement('div'); r.className = 'row';
-    if (kind === 'weak') { var b1 = document.createElement('button'); b1.type = 'button'; b1.textContent = 'Ulangi Papan Bukti'; b1.addEventListener('click', function () { $('mEnd').hidden = true; modalOpen--; S.ending = null; openBoard(); }); r.appendChild(b1); }
+    if (kind === 'weak') { var b1 = document.createElement('button'); b1.type = 'button'; b1.textContent = 'Ulangi Papan Bukti'; b1.addEventListener('click', function () { $('mEnd').hidden = true; S.ending = null; openBoard(); }); r.appendChild(b1); }
     var b = document.createElement('button'); b.type = 'button'; b.className = 'primary'; b.textContent = 'Main lagi dari awal'; b.addEventListener('click', restart); r.appendChild(b);
     c.appendChild(r);
-    $('mEnd').hidden = false; modalOpen++;
+    $('mEnd').hidden = false;
   }
-  function restart() { if (!$('mEnd').hidden) { $('mEnd').hidden = true; modalOpen--; } newState(); updNote(); dlg.Q = []; dlg.active = false; setDlgIdle(); S.f.intro_done = false; intro(); }
+  function restart() { if (!$('mEnd').hidden) { $('mEnd').hidden = true; } newState(); updNote(); dlg.Q = []; dlg.active = false; setDlgIdle(); S.f.intro_done = false; intro(); }
 
   /* ---------- hud, input ---------- */
   function updHud() {
@@ -645,7 +666,7 @@
     else { o = 'Kumpulkan semua di Ruang Musik (pintu paling kanan di Aula) untuk konfrontasi akhir.'; f.ready = true; }
     $('obj').innerHTML = o ? '<b>Tujuan:</b> ' + o : '';
   }
-  function busy() { return dlg.active || modalOpen > 0 || S.fade > .6 || !S.started || !!S.fb; }
+  function busy() { return dlg.active || isModalOpen() || S.fade > .6 || !S.started || !!S.fb; }
   function near() {
     if (busy()) return null;
     var best = null, bd = 1e9;
@@ -657,7 +678,7 @@
   }
   var POSE = ['musik.tkp_lantai', 'gudang.jejak_sepatu', 'lorong.rak_sepatu', 'gudang.kotak_perkakas'];
   function act() {
-    if (modalOpen > 0 && !dlg.active) return;
+    if (isModalOpen() && !dlg.active) return;
     if (dlg.active) { advance(); return; }
     var t = near(); if (!t) return;
     if (t.k === 'hs') { var c = t.h.r[0] + t.h.r[2] / 2; S.face = c >= S.x ? 1 : -1; S.seen[t.h.id] = 1; S.pose = POSE.indexOf(t.h.id) >= 0 ? 'crouch' : null; t.h.run(); }
@@ -681,9 +702,14 @@
     if (k === 'ArrowLeft' || k === 'a' || k === 'A') { keys.l = true; e.preventDefault(); }
     else if (k === 'ArrowRight' || k === 'd' || k === 'D') { keys.r = true; e.preventDefault(); }
     else if (k === 'e' || k === 'E' || k === ' ' || k === 'Enter') { if (tg && tg.tagName === 'BUTTON' && (k === ' ' || k === 'Enter')) return; e.preventDefault(); act(); }
-    else if (k >= '1' && k <= '4' && dlg.opts && dlg._cur) { var o = dlg._cur.opts[+k - 1]; if (o) choose(o); }
+    else if (k >= '1' && k <= '9' && dlg.opts && dlg._cur) { var o = dlg._cur.opts[+k - 1]; if (o) choose(o); }
     else if (k === 'n' || k === 'N') { if ($('mNote').hidden) openNote(); else closeNote(); }
-    else if (k === 'Escape') { closeNote(); }
+    else if (k === 'Escape') {
+      if (!$('mNote').hidden) closeNote();
+      else if (!$('mHelp').hidden) { $('mHelp').hidden = true; }
+      else if (!$('mPuz').hidden) { $('mPuz').hidden = true; }
+      else if (!$('mBoard').hidden) { $('mBoard').hidden = true; S.f.ready = true; }
+    }
   });
   window.addEventListener('keyup', function (e) { var k = e.key; if (k === 'ArrowLeft' || k === 'a' || k === 'A') keys.l = false; if (k === 'ArrowRight' || k === 'd' || k === 'D') keys.r = false; });
   window.addEventListener('blur', function () { keys.l = keys.r = false; });
@@ -750,7 +776,7 @@
     // penanda
     if (!busy() || dlg.active === false && S.started) {
       var bob = Math.sin(S.t * 3) * 1.5;
-      if (S.started && !S.memory && !S.fb && !dlg.active && modalOpen === 0) {
+      if (S.started && !S.memory && !S.fb && !dlg.active && !isModalOpen()) {
         HOT.forEach(function (h) { if (h.room !== r || (h.show && !h.show())) return; if (h.r[1] > 190) return; var cx = hotCenter(h.r), yy = Math.max(4, h.r[1] - 17 + bob); ctx.globalAlpha = S.seen[h.id] ? .4 : 1; ctx.drawImage(IM.ui_ikon_periksa, Math.round(cx - 8), Math.round(yy)); ctx.globalAlpha = 1; });
         EXIT.forEach(function (e) { if (e.room !== r || (e.cond && !e.cond())) return; var cx = hotCenter(e.r), yy = Math.max(4, e.r[1] - 17 + bob); ctx.drawImage(IM.ui_ikon_pintu, Math.round(cx - 8), Math.round(yy)); });
         // lantai: penanda untuk hotspot rendah
