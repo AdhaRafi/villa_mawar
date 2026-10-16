@@ -96,3 +96,13 @@ const BOARDJ = {
     [[256, 174, 28, 24], [288, 174, 28, 24]]
   ]
 };
+
+// Posisi jendela luar di tiap ruangan agar hujan dan kilat hanya tampak di balik kaca
+const ROOM_WINDOWS = {
+  "dapur_makan": [[61, 38, 47, 61]],
+  "gudang": [[214, 38, 42, 30]],
+  "ruang_musik": [[128, 40, 44, 32]],
+  "lorong_kamar": [[256, 36, 32, 60]],
+  "ruang_kerja": [[184, 34, 46, 50]],
+  "aula": []
+};

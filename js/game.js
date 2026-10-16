@@ -742,6 +742,35 @@
     if (r === 'kerja' && !S.memory && IM.p_brankas_terbuka) ctx.drawImage(S.f.discovered ? IM.p_brankas_terbuka : IM.p_brankas_tertutup, 56, 86);
     if (r === 'aula' && S.callOn && IM.p_interkom_menyala) ctx.drawImage(IM.p_interkom_menyala, 218, 100);
     if (r === 'gudang') { ctx.drawImage(IM.p_jejak_pantofel_lumpur, 44, 186); ctx.drawImage(IM.p_jejak_pantofel_lumpur, 112, 191); }
+
+    // Hujan dan kilat di luar jendela (hanya di balik kaca jendela luar, bukan di dalam ruangan)
+    var wins = (typeof ROOM_WINDOWS !== 'undefined' && ROOM_WINDOWS[bgk]) || [];
+    if (wins.length > 0 && !S.dawn) {
+      ctx.save();
+      ctx.beginPath();
+      wins.forEach(function (w) {
+        ctx.rect(w[0], w[1], w[2], w[3]);
+      });
+      ctx.clip();
+
+      // Hujan mengalir di luar jendela
+      ctx.globalAlpha = 0.7;
+      ctx.drawImage(IM['rain' + (Math.floor(S.t * 8) % 4)], 0, 0);
+
+      // Kilat menyambar di langit luar
+      if (S.flash > .05) {
+        ctx.globalAlpha = Math.min(1, S.flash) * 0.9;
+        ctx.drawImage(IM.kilat, 0, 0);
+      }
+      ctx.restore();
+    }
+
+    // Pantulan kilatan petir alami ke dalam ruangan
+    if (S.flash > .05 && !S.dawn && wins.length > 0) {
+      ctx.fillStyle = 'rgba(200, 220, 255, ' + (S.flash * 0.14) + ')';
+      ctx.fillRect(0, 0, LW, LH);
+    }
+
     // karakter
     var spk = S.spk && dlg.active;
     if (S.memory) {
@@ -756,9 +785,6 @@
         drawChar('raka', an, S.x, S.face, S.t); nameTag(S.x, 'Raka', '#74bdb2');
       }
     }
-    // hujan dan kilat
-    if (!S.dawn) { ctx.globalAlpha = .42; ctx.drawImage(IM['rain' + (Math.floor(S.t * 8) % 4)], 0, 0); ctx.globalAlpha = 1; }
-    if (S.flash > .05 && !S.dawn) { ctx.globalAlpha = Math.min(1, S.flash) * .85; ctx.drawImage(IM.kilat, 0, 0); ctx.globalAlpha = 1; }
     if (S.memory) { ctx.fillStyle = 'rgba(150,100,40,.28)'; ctx.fillRect(0, 0, LW, LH); }
     // kilas balik
     if (S.fb) {
