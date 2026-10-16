@@ -101,7 +101,14 @@
   var EVORDER = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11'];
   var EVIMG = { B1: 'interkom_menyala', B2: 'jam_musik_retak_2145', B3: 'kaca_pecah_di_atas_darah', B4: 'brankas_terbuka', B5: 'arang_kertas_mjc', B6: 'map_audit_mjc', B7: 'jejak_pantofel_lumpur', B8: 'pantofel_bima_lumpur_merah', B9: 'kotak_perkakas_pembuka_surat', B10: 'jas_hujan_tamu_berdarah', B11: 'asap_jaket_bima' };
   function evSrc(id) { return ASSETS['p_' + EVIMG[id]]; }
-  function addEv(id) { if (S.ev[id]) return; S.ev[id] = []; S.noteT = 1.6; toast('Bukti baru: ' + EVD[id][0], evSrc(id)); updNote(); }
+  function addEv(id) {
+    if (S.ev[id]) return;
+    S.ev[id] = [];
+    S.noteT = 1.6;
+    toast('Bukti baru: ' + EVD[id][0], evSrc(id));
+    updNote();
+    if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
+  }
   function extra(id, t) { if (!S.ev[id]) return; if (S.ev[id].indexOf(t) < 0) S.ev[id].push(t); }
   function updNote() { $('nEv').textContent = Object.keys(S.ev).length; }
   var tt; function toast(t, src) { var e = $('toast'); e.innerHTML = ''; if (src) { var i = document.createElement('img'); i.src = src; i.alt = ''; e.appendChild(i); } var s = document.createElement('span'); s.textContent = t; e.appendChild(s); e.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { e.classList.remove('on'); }, 2800); }
@@ -129,6 +136,7 @@
     $('txt').textContent = '';
     typeT = setInterval(function () {
       dlg.pos += 2; $('txt').textContent = dlg.full.slice(0, dlg.pos);
+      if (typeof GameAudio !== 'undefined' && dlg.pos % 4 === 0) GameAudio.typeBeep(k);
       if (k && ex === 'netral') setPor(k, (Math.floor(dlg.pos / 6) % 2) ? 'bicara' : 'netral');
       if (dlg.pos >= dlg.full.length) finishType();
     }, 26);
@@ -161,7 +169,10 @@
   function ex(room, key, label, to, cond) { EXIT.push({ room: room, key: key, r: R_(room, 'exits', key), label: label, to: to, cond: cond }); }
   function go(room, fromRoom) {
     var x = 60;
-    if (fromRoom) { EXIT.forEach(function (e) { if (e.room === room && e.to === fromRoom) x = e.r[0] + e.r[2] / 2; }); }
+    if (fromRoom) {
+      EXIT.forEach(function (e) { if (e.room === room && e.to === fromRoom) x = e.r[0] + e.r[2] / 2; });
+      if (typeof GameAudio !== 'undefined') GameAudio.door();
+    }
     S.fade = 1; S.room = room; S.x = x; S.f['v_' + room] = true; S.face = 1; updHud();
   }
   // Aula
@@ -346,7 +357,7 @@
       ['Sari', 'Cuma hujannya, Pak. ... Bapak benar-benar hanya teman lama Pak Arga?'],
       ['Raka', 'Kenapa kau bertanya?'],
       ['Sari', 'Beliau pernah bilang, kalau ada apa-apa saya boleh percaya pada Bapak. Permisi.', 'terpejam'],
-      function () { S.sari = null; setTime('21.00'); S.callOn = true; },
+      function () { S.sari = null; setTime('21.00'); S.callOn = true; if (typeof GameAudio !== 'undefined') GameAudio.clockChime(9); },
       ['', 'Jam di Ruang Musik berdentang sembilan kali. Interkom berdering.'],
       ['Dimas (interkom)', 'Dimas dari pos jaga, Pak. Longsor kedua di tikungan dua. Mobil tidak akan bisa lewat sampai subuh.'],
       ['Raka', 'Kau tetap di pos?'],
@@ -355,7 +366,7 @@
       function () { setTime('21.14'); S.callOn = true; },
       ['', 'Interkom berdering lagi.'],
       ['Dimas (interkom)', 'Pak, tikungan satu ikut longsor. Saya masih di pos.'],
-      function () { S.callOn = false; },
+      function () { S.callOn = false; if (typeof GameAudio !== 'undefined') GameAudio.clockChime(1); },
       ['', 'Dari ruang sebelah, jam berdentang sekali. Seperempat lewat sembilan. Raka kembali ke kamarnya dan membaca.'],
       function () { addEv('B2'); setTime('22.05'); S.x = 96; },
       ['', '22.05. Sebuah teriakan memecah malam, dari arah Ruang Musik.'],
@@ -472,10 +483,21 @@
   function chk(chip, i) {
     var P = curP.P, inp = chip.querySelector('input'), x = parseNum(inp.value), ch = chip.querySelector('.ch'), vf = chip.querySelector('.vf');
     chip.classList.remove('ok', 'bad'); ch.textContent = ''; vf.textContent = '';
-    if (x === null) { if (inp.value.trim()) chip.classList.add('bad'); finishCheck(); return; }
+    if (x === null) {
+      if (inp.value.trim()) {
+        chip.classList.add('bad');
+        if (typeof GameAudio !== 'undefined') GameAudio.puzzleWrong();
+      }
+      finishCheck();
+      return;
+    }
     var okv = P.fn(x) === curP.cipher[i];
     if (Math.abs(x) <= 26) ch.textContent = x === 0 ? '␣' : chr(x);
     chip.classList.add(okv ? 'ok' : 'bad');
+    if (typeof GameAudio !== 'undefined') {
+      if (okv) GameAudio.puzzleCorrect();
+      else GameAudio.puzzleWrong();
+    }
     if (curP.id === 'p1' || curP.vf) vf.textContent = '→' + P.fn(x);
     finishCheck();
   }
@@ -484,7 +506,9 @@
     var chips = document.querySelectorAll('#cipher .chip'), all = true;
     Array.prototype.forEach.call(chips, function (c) { if (!c.classList.contains('ok')) all = false; });
     if (all) {
-      curP.solved = true; var r = $('puzRes'); r.className = 'solved';
+      curP.solved = true;
+      if (typeof GameAudio !== 'undefined') GameAudio.puzzleSolved();
+      var r = $('puzRes'); r.className = 'solved';
       r.innerHTML = '<div class="muted">Pesan terbuka</div><div class="msg"></div>'; r.querySelector('.msg').textContent = '“' + curP.P.msg + '”';
       var b = document.createElement('button'); b.type = 'button'; b.className = 'primary'; b.textContent = 'Lanjutkan'; b.style.marginTop = '10px';
       b.addEventListener('click', function () { $('mPuz').hidden = true; var id = curP.id; if (id === 'p1') afterP1(); else afterP2(); });
@@ -718,11 +742,26 @@
   var last = 0, promptT = '';
   function frame(ts) {
     var dt = Math.min(.05, (ts - last) / 1000 || 0); last = ts; S.t += dt;
-    S.flashT -= dt; if (S.flashT <= 0) { S.flash = 1; S.flashT = 7 + Math.random() * 10; } S.flash = Math.max(0, S.flash - dt * 2.2);
+    S.flashT -= dt;
+    if (S.flashT <= 0) {
+      S.flash = 1;
+      S.flashT = 7 + Math.random() * 10;
+      if (typeof GameAudio !== 'undefined') GameAudio.thunder();
+    }
+    S.flash = Math.max(0, S.flash - dt * 2.2);
     if (S.fade > 0) S.fade = Math.max(0, S.fade - dt * 2.4);
     if (S.noteT > 0) S.noteT -= dt;
     var moving = false;
-    if (!busy()) { var dx = (keys.r ? 1 : 0) - (keys.l ? 1 : 0); if (dx) { S.x = Math.max(14, Math.min(370, S.x + dx * 84 * dt)); S.face = dx; moving = true; S.pose = null; } }
+    if (!busy()) {
+      var dx = (keys.r ? 1 : 0) - (keys.l ? 1 : 0);
+      if (dx) {
+        S.x = Math.max(14, Math.min(370, S.x + dx * 84 * dt));
+        S.face = dx;
+        moving = true;
+        S.pose = null;
+        if (typeof GameAudio !== 'undefined') GameAudio.step();
+      }
+    }
     if (S.fb) { S.fb.t += dt; if (S.fb.t > S.fb.dur) S.fb = null; }
     draw(moving);
     requestAnimationFrame(frame);
@@ -817,7 +856,18 @@
   }
 
   /* ---------- mulai ---------- */
-  $('bStart').addEventListener('click', function () { $('mTitle').hidden = true; updNote(); intro(); });
+  var bAud = $('bAudio');
+  if (bAud && typeof GameAudio !== 'undefined') {
+    bAud.addEventListener('click', function () {
+      var unmuted = GameAudio.toggleMute();
+      bAud.textContent = unmuted ? '🔊 Suara: Nyala' : '🔇 Suara: Mati';
+      GameAudio.clickUI();
+    });
+  }
+  $('bStart').addEventListener('click', function () {
+    if (typeof GameAudio !== 'undefined') GameAudio.start();
+    $('mTitle').hidden = true; updNote(); intro();
+  });
   setDlgIdle(); updHud();
   loadAll().then(function () { $('titleImg').src = ASSETS.bg_aula; requestAnimationFrame(frame); });
   window.__g = { S: function () { return S; }, say: say, go: go, addEv: addEv, openPuz: openPuz, finale: finale, openBoard: openBoard, ending: ending, PUZ: PUZ, enc: enc, IM: IM };
