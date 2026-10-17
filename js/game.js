@@ -69,11 +69,19 @@
   var ATL = {
     base: { idle: [0, 4, 6], walk: [1, 6, 10], run: [2, 6, 14], crouch: [5, 2, 6], hurt: [6, 2, 8], talk: [7, 4, 6] },
     raka: { idle: [0, 4, 6], walk: [1, 6, 10], run: [2, 6, 14], crouch: [5, 2, 6], hurt: [6, 2, 8], talk: [7, 4, 6], notes: [8, 4, 5] },
+    noah: { idle: [0, 4, 6], walk: [1, 6, 10], run: [2, 6, 14], crouch: [5, 2, 6], hurt: [6, 2, 8], talk: [7, 4, 6], notes: [8, 4, 5] },
     siluet_pelaku: { idle: [0, 4, 6], walk: [1, 6, 10], run: [2, 6, 14], attack: [6, 4, 12], hurt: [7, 2, 8] }
   };
   var RK = { aula: 'aula', musik: 'ruang_musik', kerja: 'ruang_kerja', dapur: 'dapur_makan', lorong: 'lorong_kamar', gudang: 'gudang' };
-  var RN = { aula: 'Aula', musik: 'Ruang Musik', kerja: 'Ruang Kerja', dapur: 'Dapur & Ruang Makan', lorong: 'Lorong & Kamar Raka', gudang: 'Gudang' };
-  var NAME = { sari: 'Sari', dimas: 'Dimas', naya: 'Naya', bima: 'Bima', arga: 'Arga', raka: 'Raka' };
+  var RN = { aula: 'Aula', musik: 'Ruang Musik', kerja: 'Ruang Kerja', dapur: 'Dapur & Ruang Makan', lorong: 'Lorong & Kamar Noah', gudang: 'Gudang' };
+  var NAME = {
+    harin: 'Harin', sari: 'Harin',
+    dimas: 'Dimas',
+    yuna: 'Yuna', naya: 'Yuna',
+    jake: 'Jake', bima: 'Jake',
+    surya: 'Pak Surya', arga: 'Pak Surya',
+    noah: 'Noah', raka: 'Noah'
+  };
 
   function drawChar(id, anim, x, face, tm, once) {
     var T = ATL[id] || ATL.base, A = T[anim] || T.idle, sh = IM['ch_' + id];
@@ -106,7 +114,7 @@
     S = {
       room: 'aula', x: 110, face: 1, f: {}, ev: {}, time: '--.--',
       fade: 0, flash: 0, flashT: 5, t: 0, started: false,
-      spk: null, noteT: 0, sari: null, callOn: false,
+      spk: null, noteT: 0, harin: null, sari: null, callOn: false,
       memory: false, dawn: false, ending: null
     };
   }
@@ -118,15 +126,15 @@
     B2: ['Jam dinding Ruang Musik', 'Jam retak dan jarum berhenti di angka 21.45. Waktu ini dicurigai sebagai rekayasa pelaku.'],
     B3: ['Pecahan kaca di atas darah', 'Kaca jam berdiri pecah di atas genangan darah yang sudah mengental. Pembunuhan terjadi sebelum kaca dipecahkan.'],
     B5: ['Arang laporan audit di gudang', 'Sisa kertas terbakar di drum minyak gudang memuat tulisan “Audit MJC”. Laporan keuangan sengaja dihanguskan.'],
-    B6: ['Memo audit Pak Arga', 'Arga mencatat adanya pengeluaran fiktif vendor MJC yang disetujui Bima.'],
+    B6: ['Memo audit Pak Surya', 'Pak Surya mencatat adanya pengeluaran fiktif vendor MJC yang disetujui Jake.'],
     B7: ['Jejak pantofel lumpur merah', 'Jejak sepatu bersol halus dengan lumpur tanah merah dari halaman belakang menuju gudang.'],
-    B8: ['Pantofel Bima bernoda merah', 'Bima memakai sandal rumah, sedangkan sepatu pantofelnya disembunyikan dengan sol tanah merah.'],
+    B8: ['Pantofel Jake bernoda merah', 'Jake memakai sandal rumah, sedangkan sepatu pantofelnya disembunyikan dengan sol tanah merah.'],
     B10: ['Kartu Bunga Dua Kelopak', 'Kartu sandi fungsi komposisi tersembunyi di gudang: (g∘f)(x) = 10x − 5.']
   };
   var EVIMG = {
     B1: 'interkom_menyala', B2: 'jam_musik_retak_2145', B3: 'kaca_pecah_di_atas_darah',
     B5: 'arang_kertas_mjc', B6: 'map_audit_mjc', B7: 'jejak_pantofel_lumpur',
-    B8: 'pantofel_bima_lumpur_merah', B10: 'kartu_sandi_2_dua_kelopak_x3'
+    B8: 'pantofel_jake_lumpur_merah', B10: 'kartu_sandi_2_dua_kelopak_x3'
   };
   function evSrc(id) { return ASSETS['p_' + (EVIMG[id] || 'kartu_sandi_1_x3')]; }
   function addEv(id) {
@@ -155,12 +163,12 @@
 
   function pkey(n) {
     if (!n) return null;
-    if (/^Raka/.test(n)) return 'raka';
-    if (/^Sari/.test(n)) return 'sari';
-    if (/^Dimas/.test(n)) return 'dimas';
-    if (/^Naya/.test(n)) return 'naya';
-    if (/^Bima/.test(n)) return 'bima';
-    if (/Arga/.test(n)) return 'arga';
+    if (/^(Noah|Raka)/i.test(n)) return 'noah';
+    if (/^(Harin|Sari)/i.test(n)) return 'harin';
+    if (/^Dimas/i.test(n)) return 'dimas';
+    if (/^(Yuna|Naya)/i.test(n)) return 'yuna';
+    if (/^(Jake|Bima)/i.test(n)) return 'jake';
+    if (/^(Pak\s+Surya|Surya|Pak\s+Arga|Arga)/i.test(n)) return 'surya';
     return null;
   }
   function setPor(k, ex) {
@@ -411,35 +419,35 @@
       S.started = true; S.room = 'dapur'; S.memory = true; setTime('19.00');
       say([
         ['', 'Villa Mawar, pukul 19.00. Badai menutup satu-satunya jalan menuju kota.'],
-        ['Pak Arga', 'Terima kasih sudah datang. Besok pagi ada keputusan penting soal laporan audit keuangan Mawar Karya.'],
-        ['Naya', 'Paman tidak boleh menjual villa ini! Itu rumah peninggalan Ibu!', 'terkejut'],
-        ['Bima', 'Arga, bicarakan nanti saja. Jangan di depan tamu.', 'bicara'],
-        ['', 'Bima, direktur keuangan Mawar Karya, tampak gelisah sambil mengaduk kopinya.'],
-        ['', 'Pukul 20.00, longsor kedua memutus kabel telepon. Detektif Raka terus mengamati situasi.'],
+        ['Pak Surya', 'Terima kasih sudah datang. Besok pagi ada keputusan penting soal laporan audit keuangan Mawar Karya.'],
+        ['Yuna', 'Paman tidak boleh menjual villa ini! Itu rumah peninggalan Ibu!', 'terkejut'],
+        ['Jake', 'Surya, bicarakan nanti saja. Jangan di depan tamu.', 'bicara'],
+        ['', 'Jake, direktur keuangan Mawar Karya, tampak gelisah sambil mengaduk kopinya.'],
+        ['', 'Pukul 20.00, longsor kedua memutus kabel telepon. Detektif Noah terus mengamati situasi.'],
         function () {
           S.memory = false; S.room = 'aula'; S.x = 96; S.fade = 1; setTime('20.55');
-          S.sari = { x: 170 };
+          S.harin = { x: 170 }; S.sari = S.harin;
         },
         ['', 'Aula Villa Mawar. Hujan deras menghantam kaca jendela.'],
-        ['Sari', 'Teh hangat untuk Bapak. Satu lagi untuk Pak Arga di ruang musik. Beliau berpesan tidak ingin diganggu.'],
-        ['Raka', 'Terima kasih, Sari. Kau tampak sangat cemas.'],
-        ['Sari', 'Hanya badainya, Pak... Pak Arga pernah berpesan, kalau terjadi sesuatu, saya harus percaya pada Bapak.', 'terpejam'],
-        function () { S.sari = null; setTime('21.00'); S.callOn = true; if (typeof GameAudio !== 'undefined') GameAudio.clockChime(9); },
+        ['Harin', 'Teh hangat untuk Bapak. Satu lagi untuk Pak Surya di ruang musik. Beliau berpesan tidak ingin diganggu.'],
+        ['Noah', 'Terima kasih, Harin. Kau tampak sangat cemas.'],
+        ['Harin', 'Hanya badainya, Pak... Pak Surya pernah berpesan, kalau terjadi sesuatu, saya harus percaya pada Bapak.', 'terpejam'],
+        function () { S.harin = null; S.sari = null; setTime('21.00'); S.callOn = true; if (typeof GameAudio !== 'undefined') GameAudio.clockChime(9); },
         ['', 'Lonceng jam di Ruang Musik berdentang sembilan kali. Interkom pos jaga berdering.'],
         ['Dimas (interkom)', 'Pak, longsor di tikungan dua makin parah. Mobil tak bisa lewat sampai subuh. Saya pantau di pos jaga.'],
         function () { addEv('B1'); S.callOn = false; setTime('22.05'); },
         ['', 'Pukul 22.05. Sebuah jeritan histeris membelah malam dari arah Ruang Musik!'],
-        ['Naya', 'Paman Arga!! Darah di mana-mana!!', 'terkejut'],
+        ['Yuna', 'Paman Surya!! Darah di mana-mana!!', 'terkejut'],
         function () {
           S.room = 'musik'; S.x = 110; S.f.discovered = true;
           addEv('B2'); addEv('B3');
         },
-        ['', 'Pak Arga ditemukan tewas di depan piano. Jam antik di dekatnya retak dan mati di angka 21.45.'],
-        ['Raka', 'Semua tenang! Jangan ada yang menyentuh TKP. Pelakunya pasti masih ada di dalam villa ini.'],
-        function () { S.sari = { x: 280 }; },
-        ['Sari', 'Pak Raka... Saya menemukan secarik kertas ini di bawah cangkir teh Pak Arga...', 'terpejam'],
-        ['Sari', 'Pak Arga pernah mengajari saya bahwa angka-angka ini adalah pesan rahasia yang dikunci dengan rumus fungsi matematika: f(x) = 5x − 1!'],
-        ['Raka', 'Kertas ini kunci penyelidikan kita. Biar kubongkar pesan ini dengan fungsi inversnya!']
+        ['', 'Pak Surya ditemukan tewas di depan piano. Jam antik di dekatnya retak dan mati di angka 21.45.'],
+        ['Noah', 'Semua tenang! Jangan ada yang menyentuh TKP. Pelakunya pasti masih ada di dalam villa ini.'],
+        function () { S.harin = { x: 280 }; S.sari = S.harin; },
+        ['Harin', 'Pak Noah... Saya menemukan secarik kertas ini di bawah cangkir teh Pak Surya...', 'terpejam'],
+        ['Harin', 'Pak Surya pernah mengajari saya bahwa angka-angka ini adalah pesan rahasia yang dikunci dengan rumus fungsi matematika: f(x) = 5x − 1!'],
+        ['Noah', 'Kertas ini kunci penyelidikan kita. Biar kubongkar pesan ini dengan fungsi inversnya!']
       ], function () {
         openPuz('p1');
       });
@@ -450,18 +458,18 @@
   function afterP1() {
     showChapter(4, function () {
       setTime('23.10'); S.f.p1 = true;
-      S.room = 'gudang'; S.x = 160; S.sari = null;
+      S.room = 'gudang'; S.x = 160; S.harin = null; S.sari = null;
       addEv('B7'); addEv('B5');
       say([
-        ['Raka', 'Pesan Sandi 1 terpecahkan: “Pelaku Ada Di Gudang”. Si pembuat pesan ingin kita memeriksa gudang belakang!'],
-        ['', 'Raka menyelinap ke gudang di belakang dapur. Hujan masih menderu di luar kaca jendela.'],
-        ['Raka', 'Lihat ini... Jejak sepatu pantofel basah bertanah merah mengarah ke kotak perkakas.'],
+        ['Noah', 'Pesan Sandi 1 terpecahkan: “Pelaku Ada Di Gudang”. Si pembuat pesan ingin kita memeriksa gudang belakang!'],
+        ['', 'Noah menyelinap ke gudang di belakang dapur. Hujan masih menderu di luar kaca jendela.'],
+        ['Noah', 'Lihat ini... Jejak sepatu pantofel basah bertanah merah mengarah ke kotak perkakas.'],
         ['', 'Di dalam drum minyak tua, terdapat abu sisa pembakaran kertas laporan audit keuangan MJC.'],
-        ['Raka', 'Pelaku membakar bukti kejahatan keuangannya di sini! Dan... apa ini di bawah peti?'],
+        ['Noah', 'Pelaku membakar bukti kejahatan keuangannya di sini! Dan... apa ini di bawah peti?'],
         function () { addEv('B10'); },
         ['', 'Sebuah kartu rahasia kedua bersimbol Bunga Mawar Dua Kelopak terselip di balik tumpukan peti!'],
-        ['Raka', 'Ini sandi dua lapis... f(x) = 5x − 1 lalu ditimpa g(x) = 2x − 3. Fungsi Komposisi!'],
-        ['Raka', 'Pelaku mengunci rahasianya dengan matematika berlapis. Kita harus membalikkan fungsi komposisinya!']
+        ['Noah', 'Ini sandi dua lapis... f(x) = 5x − 1 lalu ditimpa g(x) = 2x − 3. Fungsi Komposisi!'],
+        ['Noah', 'Pelaku mengunci rahasianya dengan matematika berlapis. Kita harus membalikkan fungsi komposisinya!']
       ], function () {
         openPuz('p2');
       });
@@ -474,45 +482,45 @@
       setTime('05.30'); S.dawn = true; S.room = 'musik'; S.x = 90;
       addEv('B8'); addEv('B6');
       say([
-        ['Raka', 'Pesan Sandi 2 terpecahkan: “Jam Musik Bohong”!!'],
-        ['Raka', 'Jam dinding antik sengaja dimajukan ke 21.45 dan dirusak untuk memalsukan alibi! Pak Arga tewas jauh sebelum jam sembilan lewat seperempat!'],
+        ['Noah', 'Pesan Sandi 2 terpecahkan: “Jam Musik Bohong”!!'],
+        ['Noah', 'Jam dinding antik sengaja dimajukan ke 21.45 dan dirusak untuk memalsukan alibi! Pak Surya tewas jauh sebelum jam sembilan lewat seperempat!'],
         ['', 'Fajar mulai menyingsing di jendela Ruang Musik. Seluruh penghuni villa dikumpulkan.'],
-        ['Bima', 'Sudah pagi, Detektif. Badai sudah reda dan jalan mulai dibuka. Siapa pelaku yang kau tuduh?', 'bicara'],
-        ['Naya', 'Pasti Dimas si penjaga pos! Dia yang memegang kunci perkakas!', 'terkejut'],
+        ['Jake', 'Sudah pagi, Detektif. Badai sudah reda dan jalan mulai dibuka. Siapa pelaku yang kau tuduh?', 'bicara'],
+        ['Yuna', 'Pasti Dimas si penjaga pos! Dia yang memegang kunci perkakas!', 'terkejut'],
         ['Dimas', 'Demi Tuhan bukan saya! Sepatu saya bot karet bergerigi, bukan pantofel mahal bertanah merah!'],
-        ['Raka', 'Semua bukti matematika sudah membuktikan siapa pelaku sebenarnya!'],
+        ['Noah', 'Semua bukti matematika sudah membuktikan siapa pelaku sebenarnya!'],
         {
           ask: {
-            who: 'Raka',
-            q: 'Berdasarkan Sandi 1 (Pelaku di Gudang), Sandi 2 (Jam Musik Bohong), dan motif pembakaran audit MJC, siapakah pembunuh Pak Arga?',
+            who: 'Noah',
+            q: 'Berdasarkan Sandi 1 (Pelaku di Gudang), Sandi 2 (Jam Musik Bohong), dan motif pembakaran audit MJC, siapakah pembunuh Pak Surya?',
             opts: [
               {
-                t: 'Bima (Direktur Keuangan Mawar Karya)',
+                t: 'Jake (Direktur Keuangan Mawar Karya)',
                 lines: [
-                  ['Raka', 'Pelakunya adalah Anda, Bima!'],
-                  ['Bima', 'Apa buktimu?! Aku berada di aula dan kamarku sepanjang malam!', 'terkejut'],
-                  ['Raka', 'Jam musik dimajukan ke 21.45 agar kau tampak punya alibi. Padahal saat Sari ke gudang pukul 21.15, kau sudah di sana membakar buku audit!'],
-                  ['Raka', 'Dan tanah merah di sol pantofel hitammu... hanya ada di halaman belakang dekat gudang tempat surat Arga ditemukan!'],
-                  ['Bima', 'Cukup... Cukup! Arga tahu soal dana fiktif vendor MJC dan hendak melaporkanku pagi ini... Aku tak punya pilihan!', 'terpejam'],
-                  function () { ending('win', 'Bima'); }
+                  ['Noah', 'Pelakunya adalah Anda, Jake!'],
+                  ['Jake', 'Apa buktimu?! Aku berada di aula dan kamarku sepanjang malam!', 'terkejut'],
+                  ['Noah', 'Jam musik dimajukan ke 21.45 agar kau tampak punya alibi. Padahal saat Harin ke gudang pukul 21.15, kau sudah di sana membakar buku audit!'],
+                  ['Noah', 'Dan tanah merah di sol pantofel hitammu... hanya ada di halaman belakang dekat gudang tempat surat Pak Surya ditemukan!'],
+                  ['Jake', 'Cukup... Cukup! Surya tahu soal dana fiktif vendor MJC dan hendak melaporkanku pagi ini... Aku tak punya pilihan!', 'terpejam'],
+                  function () { ending('win', 'Jake'); }
                 ]
               },
               {
                 t: 'Dimas (Penjaga Pos Jaga)',
                 lines: [
-                  ['Raka', 'Dimas, apa kau pelakunya?'],
+                  ['Noah', 'Dimas, apa kau pelakunya?'],
                   ['Dimas', 'Pak Detektif, kabel interkom membuktikan saya di pos saat 21.00 dan 21.14! Dan sol sepatu saya bot bergerigi, bukan sol pantofel halus!'],
-                  ['Raka', 'Tunggu... Dimas benar. Sol sepatu di gudang adalah pantofel halus milik Bima, dan orang yang punya motif audit keuangan adalah Bima!'],
+                  ['Noah', 'Tunggu... Dimas benar. Sol sepatu di gudang adalah pantofel halus milik Jake, dan orang yang punya motif audit keuangan adalah Jake!'],
                   function () { ending('weak', 'Dimas'); }
                 ]
               },
               {
-                t: 'Naya (Keponakan Korban)',
+                t: 'Yuna (Keponakan Korban)',
                 lines: [
-                  ['Raka', 'Naya, apa kau membunuh pamanmu karena sengketa villa?'],
-                  ['Naya', 'Saya memang marah soal villa, tapi saya tidak tahu menahu soal pembakaran kertas audit keuangan di gudang! Sepatu saya kets putih!', 'terkejut'],
-                  ['Raka', 'Benar... pembunuh sebenarnya berkepentingan menghilangkan audit keuangan MJC dan memakai pantofel hitam berlumur tanah merah: Bima!'],
-                  function () { ending('wrong', 'Naya'); }
+                  ['Noah', 'Yuna, apa kau membunuh pamanmu karena sengketa villa?'],
+                  ['Yuna', 'Saya memang marah soal villa, tapi saya tidak tahu menahu soal pembakaran kertas audit keuangan di gudang! Sepatu saya kets putih!', 'terkejut'],
+                  ['Noah', 'Benar... pembunuh sebenarnya berkepentingan menghilangkan audit keuangan MJC dan memakai pantofel hitam berlumur tanah merah: Jake!'],
+                  function () { ending('wrong', 'Yuna'); }
                 ]
               }
             ]
@@ -534,12 +542,12 @@
     var c = $('endCard'), E = ENDS[kind] || ENDS.win, body = [];
 
     if (kind === 'win') {
-      body.push('Dengan pemecahan Sandi Mawar (Fungsi Invers dan Komposisi), Raka membongkar rekayasa waktu jam dinding dan alibi palsu Bima.');
-      body.push('Bima ditangkap saat polisi tiba di pagi hari. Penggelapan dana fiktif MJC terungkap, dan Villa Mawar diselamatkan.');
-      body.push('Sari tersenyum lega. Pelajaran matematika dari Pak Arga kini menjadi penyelamat kebenaran.');
+      body.push('Dengan pemecahan Sandi Mawar (Fungsi Invers dan Komposisi), Noah membongkar rekayasa waktu jam dinding dan alibi palsu Jake.');
+      body.push('Jake ditangkap saat polisi tiba di pagi hari. Penggelapan dana fiktif MJC terungkap, dan Villa Mawar diselamatkan.');
+      body.push('Harin tersenyum lega. Pelajaran matematika dari Pak Surya kini menjadi penyelamat kebenaran.');
     } else {
       body.push('Tuduhan Anda goyah karena mengabaikan jejak sol pantofel di gudang dan hasil dekripsi Sandi 2: “Jam Musik Bohong”.');
-      body.push('Pelaku sebenarnya (Bima) memanfaatkan situasi untuk melarikan diri saat jalan dibuka.');
+      body.push('Pelaku sebenarnya (Jake) memanfaatkan situasi untuk melarikan diri saat jalan dibuka.');
       body.push('Anda boleh mencoba lagi untuk menjatuhkan tuduhan yang tepat berdasarkan bukti matematika.');
     }
 
@@ -593,7 +601,7 @@
 
     // Catatan Sandi Matematika
     var sm = document.createElement('div'); sm.className = 'ev';
-    sm.innerHTML = '<img class="th" src="' + ASSETS.p_surat_arga + '" alt=""><div class="bd"><b>Ringkasan Rumus Sandi Mawar</b><span><b>Sandi 1 (Fungsi Invers):</b> y = 5x − 1  →  <b>x = (y + 1) / 5</b></span><span><b>Sandi 2 (Fungsi Komposisi):</b> y = 10x − 5  →  <b>x = (y + 5) / 10</b></span></div>';
+    sm.innerHTML = '<img class="th" src="' + (ASSETS.p_surat_surya || ASSETS.p_surat_arga) + '" alt=""><div class="bd"><b>Ringkasan Rumus Sandi Mawar</b><span><b>Sandi 1 (Fungsi Invers):</b> y = 5x − 1  →  <b>x = (y + 1) / 5</b></span><span><b>Sandi 2 (Fungsi Komposisi):</b> y = 10x − 5  →  <b>x = (y + 5) / 10</b></span></div>';
     l.appendChild(sm);
 
     c.appendChild(l);
@@ -740,7 +748,7 @@
     // Gambar Karakter dalam Adegan
     var spk = S.spk && dlg.active;
     if (S.memory) {
-      var mc = [['naya', 190, 1], ['arga', 236, -1], ['bima', 284, -1], ['raka', 330, -1]];
+      var mc = [['yuna', 190, 1], ['surya', 236, -1], ['jake', 284, -1], ['noah', 330, -1]];
       mc.forEach(function (c) {
         drawChar(c[0], (spk && S.spk === c[0]) ? 'talk' : 'idle', c[1], c[2], S.t);
         nameTag(c[1], NAME[c[0]], '#dcae55');
@@ -748,31 +756,33 @@
       ctx.fillStyle = 'rgba(150,100,40,.24)';
       ctx.fillRect(0, 0, LW, LH);
     } else if (S.room === 'aula') {
-      drawChar('raka', (spk && S.spk === 'raka') ? 'talk' : 'idle', 110, 1, S.t);
-      nameTag(110, 'Raka', '#74bdb2');
-      if (S.sari) {
-        drawChar('sari', (spk && S.spk === 'sari') ? 'talk' : 'idle', S.sari.x, -1, S.t);
-        nameTag(S.sari.x, 'Sari', '#dcae55');
+      drawChar('noah', (spk && S.spk === 'noah') ? 'talk' : 'idle', 110, 1, S.t);
+      nameTag(110, 'Noah', '#74bdb2');
+      var h1 = S.harin || S.sari;
+      if (h1) {
+        drawChar('harin', (spk && S.spk === 'harin') ? 'talk' : 'idle', h1.x, -1, S.t);
+        nameTag(h1.x, 'Harin', '#dcae55');
       }
     } else if (S.room === 'gudang') {
-      drawChar('raka', (spk && S.spk === 'raka') ? 'talk' : 'idle', 170, 1, S.t);
-      nameTag(170, 'Raka', '#74bdb2');
+      drawChar('noah', (spk && S.spk === 'noah') ? 'talk' : 'idle', 170, 1, S.t);
+      nameTag(170, 'Noah', '#74bdb2');
     } else if (S.room === 'musik') {
       if (S.dawn) {
-        drawChar('raka', (spk && S.spk === 'raka') ? 'talk' : 'idle', 85, 1, S.t);
-        nameTag(85, 'Raka', '#74bdb2');
-        drawChar('bima', (spk && S.spk === 'bima') ? 'talk' : 'idle', 175, -1, S.t);
-        nameTag(175, 'Bima', '#dcae55');
+        drawChar('noah', (spk && S.spk === 'noah') ? 'talk' : 'idle', 85, 1, S.t);
+        nameTag(85, 'Noah', '#74bdb2');
+        drawChar('jake', (spk && S.spk === 'jake') ? 'talk' : 'idle', 175, -1, S.t);
+        nameTag(175, 'Jake', '#dcae55');
         drawChar('dimas', (spk && S.spk === 'dimas') ? 'talk' : 'idle', 245, -1, S.t);
         nameTag(245, 'Dimas', '#dcae55');
-        drawChar('naya', (spk && S.spk === 'naya') ? 'talk' : 'idle', 310, -1, S.t);
-        nameTag(310, 'Naya', '#dcae55');
+        drawChar('yuna', (spk && S.spk === 'yuna') ? 'talk' : 'idle', 310, -1, S.t);
+        nameTag(310, 'Yuna', '#dcae55');
       } else {
-        drawChar('raka', (spk && S.spk === 'raka') ? 'talk' : 'idle', 105, 1, S.t);
-        nameTag(105, 'Raka', '#74bdb2');
-        if (S.sari) {
-          drawChar('sari', (spk && S.spk === 'sari') ? 'talk' : 'idle', S.sari.x, -1, S.t);
-          nameTag(S.sari.x, 'Sari', '#dcae55');
+        drawChar('noah', (spk && S.spk === 'noah') ? 'talk' : 'idle', 105, 1, S.t);
+        nameTag(105, 'Noah', '#74bdb2');
+        var h2 = S.harin || S.sari;
+        if (h2) {
+          drawChar('harin', (spk && S.spk === 'harin') ? 'talk' : 'idle', h2.x, -1, S.t);
+          nameTag(h2.x, 'Harin', '#dcae55');
         }
       }
     }

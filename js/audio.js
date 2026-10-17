@@ -265,11 +265,12 @@ const GameAudio = (function () {
     if (!ctx || isMuted) return;
 
     var freq = 320;
-    if (speaker === 'sari') freq = 520;
-    else if (speaker === 'naya') freq = 440;
+    if (speaker === 'harin' || speaker === 'sari') freq = 520;
+    else if (speaker === 'yuna' || speaker === 'naya') freq = 440;
     else if (speaker === 'dimas') freq = 220;
-    else if (speaker === 'bima') freq = 175;
-    else if (speaker === 'raka') freq = 300;
+    else if (speaker === 'jake' || speaker === 'bima') freq = 175;
+    else if (speaker === 'surya' || speaker === 'arga') freq = 260;
+    else if (speaker === 'noah' || speaker === 'raka') freq = 300;
 
     var now = ctx.currentTime;
     var osc = ctx.createOscillator();
