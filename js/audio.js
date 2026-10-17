@@ -269,7 +269,7 @@ const GameAudio = (function () {
     else if (speaker === 'yuna' || speaker === 'naya') freq = 440;
     else if (speaker === 'dimas') freq = 220;
     else if (speaker === 'jake' || speaker === 'bima') freq = 175;
-    else if (speaker === 'surya' || speaker === 'arga') freq = 260;
+    else if (speaker === 'basuki' || speaker === 'surya' || speaker === 'arga') freq = 260;
     else if (speaker === 'noah' || speaker === 'raka') freq = 300;
 
     var now = ctx.currentTime;
