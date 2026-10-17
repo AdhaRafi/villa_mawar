@@ -644,10 +644,17 @@
   });
 
   /* ---------- hud & bab banner ---------- */
+  var _lastHud = '';
   function updHud() {
+    if (!S) return;
+    var rm = S.memory ? 'Dapur (Kilas Balik)' : (RN[S.room] || S.room);
+    var ob = S.f.p2 ? 'Konfrontasi Pelaku' : (S.f.p1 ? 'Pecahkan Sandi 2' : 'Pecahkan Sandi 1');
+    var hKey = S.time + '|' + rm + '|' + ob;
+    if (hKey === _lastHud) return;
+    _lastHud = hKey;
     $('clock').textContent = S.time;
-    $('room').textContent = S.memory ? 'Dapur (Kilas Balik)' : (RN[S.room] || S.room);
-    $('obj').textContent = S.f.p2 ? 'Konfrontasi Pelaku' : (S.f.p1 ? 'Pecahkan Sandi 2' : 'Pecahkan Sandi 1');
+    $('room').textContent = rm;
+    $('obj').textContent = ob;
   }
 
   function showChapter(num, callback) {
@@ -697,6 +704,7 @@
     S.flash = Math.max(0, S.flash - dt * 2.2);
     if (S.fade > 0) S.fade = Math.max(0, S.fade - dt * 2.4);
 
+    updHud();
     draw();
     requestAnimationFrame(frame);
   }
@@ -730,12 +738,39 @@
       wins.forEach(function (w) { ctx.rect(w[0], w[1], w[2], w[3]); });
       ctx.clip();
 
-      ctx.globalAlpha = 0.7;
-      ctx.drawImage(IM['rain' + (Math.floor(S.t * 8) % 4)], 0, 0);
+      // Lapisan suasana malam badai di balik kaca jendela
+      ctx.fillStyle = 'rgba(10, 16, 32, 0.25)';
+      ctx.fillRect(0, 0, LW, LH);
+
+      // Gambar tekstur hujan frame overlay
+      ctx.globalAlpha = 0.85;
+      var rf = Math.floor(S.t * 10) % 4;
+      if (IM['rain' + rf]) ctx.drawImage(IM['rain' + rf], 0, 0);
+
+      // Aliran hujan dinamis yang mengalir aktif di kaca jendela
+      ctx.strokeStyle = 'rgba(195, 220, 255, 0.75)';
+      ctx.lineWidth = 1;
+      wins.forEach(function (w) {
+        var rx = w[0], ry = w[1], rw = w[2], rh = w[3];
+        var count = Math.max(8, Math.floor(rw * 0.45));
+        for (var i = 0; i < count; i++) {
+          var seed = (i * 97) % rw;
+          var speed = 140 + ((i * 37) % 55);
+          var dy = (S.t * speed + i * 31) % (rh + 18);
+          var px = rx + seed;
+          var py = ry + dy - 9;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(px - 2, py + 8);
+          ctx.stroke();
+        }
+      });
 
       if (S.flash > .05) {
-        ctx.globalAlpha = Math.min(1, S.flash) * 0.9;
-        ctx.drawImage(IM.kilat, 0, 0);
+        ctx.globalAlpha = Math.min(1, S.flash) * 0.95;
+        if (IM.kilat) ctx.drawImage(IM.kilat, 0, 0);
+        ctx.fillStyle = 'rgba(230, 240, 255, ' + (S.flash * 0.45) + ')';
+        ctx.fillRect(0, 0, LW, LH);
       }
       ctx.restore();
     }
