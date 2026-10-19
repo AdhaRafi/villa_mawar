@@ -83,20 +83,29 @@
     noah: 'Noah', raka: 'Noah'
   };
 
+  var CHAR_SCALE = 1.45;
+
   function drawChar(id, anim, x, face, tm, once) {
     var T = ATL[id] || ATL.base, A = T[anim] || T.idle, sh = IM['ch_' + id];
     if (!sh) return;
     var idx = once ? Math.min(A[1] - 1, Math.floor(tm * A[2])) : Math.floor(tm * A[2]) % A[1];
-    ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(x, FEET + 1, 13, 3, 0, 0, 6.3); ctx.fill();
+    var sw = Math.round(64 * CHAR_SCALE);
+    var shH = Math.round(64 * CHAR_SCALE);
+    var ox = Math.round(32 * CHAR_SCALE);
+    var oy = Math.round(62 * CHAR_SCALE);
+    ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath();
+    ctx.ellipse(x, FEET + 1, Math.round(14 * CHAR_SCALE), Math.round(3.5 * CHAR_SCALE), 0, 0, 6.3);
+    ctx.fill();
     ctx.save(); ctx.translate(Math.round(x), 0); if (face < 0) ctx.scale(-1, 1);
-    ctx.drawImage(sh, idx * 64, A[0] * 64, 64, 64, -32, FEET - 62, 64, 64);
+    ctx.drawImage(sh, idx * 64, A[0] * 64, 64, 64, -ox, FEET - oy, sw, shH);
     ctx.restore();
   }
   function nameTag(x, t, col) {
     ctx.font = '7px "Pixelify Sans","Courier New",monospace';
     ctx.textAlign = 'center'; ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(0,0,0,.85)'; ctx.strokeText(t, x, FEET - 60);
-    ctx.fillStyle = col; ctx.fillText(t, x, FEET - 60);
+    var tagY = FEET - Math.round(52 * CHAR_SCALE) - 5;
+    ctx.strokeStyle = 'rgba(0,0,0,.85)'; ctx.strokeText(t, x, tagY);
+    ctx.fillStyle = col; ctx.fillText(t, x, tagY);
   }
 
   /* ---------- modal helper ---------- */
@@ -462,7 +471,7 @@
         },
         ['', 'Pak Basuki ditemukan tewas di depan piano. Jam antik di dekatnya retak dan mati di angka 21.45.'],
         ['Noah', 'Semua tenang! Jangan ada yang menyentuh TKP. Pelakunya pasti masih ada di dalam villa ini.'],
-        function () { S.harin = { x: 280 }; S.sari = S.harin; },
+        function () { S.harin = { x: 295 }; S.sari = S.harin; },
         ['Harin', 'Pak Noah... Saya menemukan secarik kertas ini di bawah cangkir teh Pak Basuki...', 'terpejam'],
         ['Harin', 'Pak Basuki pernah mengajari saya bahwa angka-angka ini adalah pesan rahasia yang dikunci dengan rumus fungsi matematika: f(x) = 5x − 1!'],
         ['Noah', 'Kertas ini kunci penyelidikan kita. Biar kubongkar pesan ini dengan fungsi inversnya!']
@@ -801,7 +810,7 @@
     // Gambar Karakter dalam Adegan
     var spk = S.spk && dlg.active;
     if (S.memory) {
-      var mc = [['yuna', 190, 1], ['basuki', 236, -1], ['jake', 284, -1], ['noah', 330, -1]];
+      var mc = [['yuna', 185, 1], ['basuki', 230, -1], ['jake', 275, -1], ['noah', 325, -1]];
       mc.forEach(function (c) {
         drawChar(c[0], (spk && S.spk === c[0]) ? 'talk' : 'idle', c[1], c[2], S.t);
         nameTag(c[1], NAME[c[0]], '#dcae55');
@@ -823,12 +832,12 @@
       if (S.dawn) {
         drawChar('noah', (spk && S.spk === 'noah') ? 'talk' : 'idle', 85, 1, S.t);
         nameTag(85, 'Noah', '#74bdb2');
-        drawChar('jake', (spk && S.spk === 'jake') ? 'talk' : 'idle', 175, -1, S.t);
-        nameTag(175, 'Jake', '#dcae55');
-        drawChar('dimas', (spk && S.spk === 'dimas') ? 'talk' : 'idle', 245, -1, S.t);
-        nameTag(245, 'Dimas', '#dcae55');
-        drawChar('yuna', (spk && S.spk === 'yuna') ? 'talk' : 'idle', 310, -1, S.t);
-        nameTag(310, 'Yuna', '#dcae55');
+        drawChar('jake', (spk && S.spk === 'jake') ? 'talk' : 'idle', 165, -1, S.t);
+        nameTag(165, 'Jake', '#dcae55');
+        drawChar('dimas', (spk && S.spk === 'dimas') ? 'talk' : 'idle', 235, -1, S.t);
+        nameTag(235, 'Dimas', '#dcae55');
+        drawChar('yuna', (spk && S.spk === 'yuna') ? 'talk' : 'idle', 305, -1, S.t);
+        nameTag(305, 'Yuna', '#dcae55');
       } else {
         drawChar('noah', (spk && S.spk === 'noah') ? 'talk' : 'idle', 105, 1, S.t);
         nameTag(105, 'Noah', '#74bdb2');
