@@ -86,7 +86,7 @@ const GameAudio = (function () {
     rainFilter2.Q.setValueAtTime(0.8, ctx.currentTime);
 
     rainGain = ctx.createGain();
-    rainGain.gain.setValueAtTime(0.42, ctx.currentTime);
+    rainGain.gain.setValueAtTime(0.20, ctx.currentTime);
 
     rainSource.connect(rainFilter1);
     rainSource.connect(rainFilter2);
@@ -123,7 +123,7 @@ const GameAudio = (function () {
     if (musicInterval) clearInterval(musicInterval);
 
     musicGain = ctx.createGain();
-    musicGain.gain.setValueAtTime(0.38, ctx.currentTime);
+    musicGain.gain.setValueAtTime(0.26, ctx.currentTime);
     musicGain.connect(masterGain);
 
     var progressions = [
@@ -259,34 +259,138 @@ const GameAudio = (function () {
     }
   }
 
-  // Suara Tekan Huruf Teks Dialog (Khas Retro Pixel)
+  // Suara Karakter Bicara / Obrolan (Retro Voice Babble / Chattering Synth)
+  // Tiap karakter memiliki frekuensi dasar (pitch), bentuk gelombang, dan resonansi vokal unik
   function typeBeep(speaker) {
     var ctx = getContext();
     if (!ctx || isMuted) return;
 
-    var freq = 320;
-    if (speaker === 'harin' || speaker === 'sari') freq = 520;
-    else if (speaker === 'yuna' || speaker === 'naya') freq = 440;
-    else if (speaker === 'dimas') freq = 220;
-    else if (speaker === 'jake' || speaker === 'bima') freq = 175;
-    else if (speaker === 'basuki' || speaker === 'surya' || speaker === 'arga') freq = 260;
-    else if (speaker === 'noah' || speaker === 'raka') freq = 300;
+    var now = ctx.currentTime;
 
+    var baseFreq = 300;
+    var waveType = 'triangle';
+    var formantFreq = 1100;
+    var formantQ = 2.0;
+    var vol = 0.38;
+
+    if (speaker === 'harin' || speaker === 'sari') {
+      // Harin: Pelayan sopan, lembut, nada tinggi jernih
+      baseFreq = 540;
+      waveType = 'sine';
+      formantFreq = 1600;
+      vol = 0.36;
+    } else if (speaker === 'yuna' || speaker === 'naya') {
+      // Yuna: Keponakan muda, nada menengah-tinggi ekspresif
+      baseFreq = 460;
+      waveType = 'triangle';
+      formantFreq = 1400;
+      vol = 0.40;
+    } else if (speaker === 'dimas') {
+      // Dimas: Penjaga pos, bariton tegas kokoh
+      baseFreq = 210;
+      waveType = 'square';
+      formantFreq = 850;
+      formantQ = 1.5;
+      vol = 0.34;
+    } else if (speaker === 'jake' || speaker === 'bima') {
+      // Jake: Direktur keuangan tegang, nada rendah agak serak
+      baseFreq = 165;
+      waveType = 'sawtooth';
+      formantFreq = 750;
+      formantQ = 2.5;
+      vol = 0.36;
+    } else if (speaker === 'basuki' || speaker === 'surya' || speaker === 'arga') {
+      // Pak Basuki: Pemilik villa / pria tua berwibawa, bass dalam
+      baseFreq = 195;
+      waveType = 'triangle';
+      formantFreq = 900;
+      vol = 0.42;
+    } else if (speaker === 'noah' || speaker === 'raka') {
+      // Detektif Noah: Tenang, analitis, nada mid-hangat khas detektif
+      baseFreq = 300;
+      waveType = 'triangle';
+      formantFreq = 1150;
+      vol = 0.40;
+    } else {
+      // Narator / Deskripsi ruangan: Nada ketikan mesin tik halus
+      baseFreq = 380;
+      waveType = 'sine';
+      formantFreq = 1800;
+      vol = 0.28;
+    }
+
+    var pitchJitter = (Math.random() * 24 - 12);
+    var pitch = Math.max(80, baseFreq + pitchJitter);
+
+    var osc1 = ctx.createOscillator();
+    osc1.type = waveType;
+    osc1.frequency.setValueAtTime(pitch, now);
+    osc1.frequency.exponentialRampToValueAtTime(pitch * 0.95, now + 0.055);
+
+    var osc2 = ctx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(pitch * 1.5, now);
+
+    var filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(formantFreq, now);
+    filter.Q.setValueAtTime(formantQ, now);
+
+    var gain = ctx.createGain();
+    gain.gain.setValueAtTime(vol, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.058);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.065);
+    osc2.stop(now + 0.065);
+  }
+
+  // SFX Lanjut Dialog (Suara Halaman / Bubble Pop)
+  function dlgAdvance() {
+    var ctx = getContext();
+    if (!ctx || isMuted) return;
     var now = ctx.currentTime;
     var osc = ctx.createOscillator();
     var gain = ctx.createGain();
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq + (Math.random() * 20 - 10), now);
-
-    gain.gain.setValueAtTime(0.18, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.038);
-
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(280, now + 0.045);
+    gain.gain.setValueAtTime(0.24, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
     osc.connect(gain);
     gain.connect(masterGain);
-
     osc.start(now);
-    osc.stop(now + 0.045);
+    osc.stop(now + 0.055);
+  }
+
+  // SFX Kejutan / Emosi Terkejut Karakter (Dramatic Stinger)
+  function dramaticShock() {
+    var ctx = getContext();
+    if (!ctx || isMuted) return;
+    var now = ctx.currentTime;
+    [311.13, 369.99, 440.00, 523.25].forEach(function (f) {
+      var osc = ctx.createOscillator();
+      var g = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(f, now);
+      g.gain.setValueAtTime(0.22, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.40);
+      var filt = ctx.createBiquadFilter();
+      filt.type = 'lowpass';
+      filt.frequency.setValueAtTime(1800, now);
+      filt.frequency.exponentialRampToValueAtTime(400, now + 0.38);
+      osc.connect(filt);
+      filt.connect(g);
+      g.connect(masterGain);
+      osc.start(now);
+      osc.stop(now + 0.42);
+    });
   }
 
   // SFX Penemuan Bukti Baru (Sparkle Clue Jingle)
@@ -544,6 +648,8 @@ const GameAudio = (function () {
     thunder: thunder,
     clockChime: clockChime,
     typeBeep: typeBeep,
+    dlgAdvance: dlgAdvance,
+    dramaticShock: dramaticShock,
     clueFound: clueFound,
     door: door,
     puzzleCorrect: puzzleCorrect,

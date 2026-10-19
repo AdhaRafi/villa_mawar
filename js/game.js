@@ -211,15 +211,31 @@
     dlg.full = text; dlg.pos = 0; dlg.k = k; dlg.ex = ex; dlg.typing = true;
     setPor(k, ex); $('hint').textContent = '';
     clearInterval(typeT);
+
+    // Mainkan sound effect emosi dramatis jika karakter terkejut/berteriak
+    if (ex === 'terkejut' && typeof GameAudio !== 'undefined') {
+      GameAudio.dramaticShock();
+    }
+
     if (REDUCED) { finishType(); return; }
     $('txt').textContent = '';
+    var stepCount = 0;
     typeT = setInterval(function () {
-      dlg.pos += 2;
+      dlg.pos++;
       $('txt').textContent = dlg.full.slice(0, dlg.pos);
-      if (typeof GameAudio !== 'undefined' && dlg.pos % 4 === 0) GameAudio.typeBeep(k);
-      if (k && ex === 'netral') setPor(k, (Math.floor(dlg.pos / 6) % 2) ? 'bicara' : 'netral');
+
+      var currChar = dlg.full.charAt(dlg.pos - 1);
+      // Bunyikan suara vokal karakter tiap 2 huruf (melewati spasi agar ritme bicara hidup & alami)
+      if (typeof GameAudio !== 'undefined' && /[a-zA-Z0-9]/.test(currChar)) {
+        stepCount++;
+        if (stepCount % 2 === 1) {
+          GameAudio.typeBeep(k);
+        }
+      }
+
+      if (k && ex === 'netral') setPor(k, (Math.floor(dlg.pos / 3) % 2) ? 'bicara' : 'netral');
       if (dlg.pos >= dlg.full.length) finishType();
-    }, 24);
+    }, 28);
   }
   function finishType() {
     clearInterval(typeT);
@@ -245,6 +261,7 @@
   }
   function choose(o) {
     dlg.opts = false; $('opts').innerHTML = '';
+    if (typeof GameAudio !== 'undefined') GameAudio.clickUI();
     if (o.fx) o.fx();
     var add = (o.lines || []).slice();
     dlg.Q = add.concat(dlg.Q);
@@ -252,6 +269,7 @@
   }
   function advance() {
     if (!dlg.active || dlg.opts) return;
+    if (typeof GameAudio !== 'undefined') GameAudio.dlgAdvance();
     if (dlg.typing) { finishType(); return; }
     nextLine();
   }
