@@ -1,4 +1,4 @@
-// Aset Resmi Villa Mawar: Sandi Terakhir
+// Aset Resmi Enkripsi Villa Mawar: Sandi Terakhir
 // Menggunakan file asset asli beresolusi tajam pixel-art
 const ASSETS = {
   "bg_aula": "assets/latar/aula.png",
