@@ -3,5 +3,3 @@ Thumbs.db
 .vercel
 node_modules/
 *.log
-scratch/
-
