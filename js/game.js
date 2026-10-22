@@ -21,7 +21,9 @@
   var PUZ = {
     p1: {
       title: 'Teka-Teki Sandi 1: Kartu di Bawah Cangkir',
-      msg: 'Pelaku Ada Di Gudang',
+      targetHash: '70ae516fc15fc64ea455cb21ebeb19354c9a384b9e0b15c7a63e7b1f642c675c',
+      cipher: [79, -26, -61, -6, -56, -106, -1, 4, -21, -6, -1, 19, -46, -1, 34, -106, -21, -6, -71, -36],
+      spaces: [6, 10, 13],
       fn: F,
       img: 'p_kartu_sandi_1_x3',
       rule: 'y = f(x) = 5x − 1',
@@ -32,12 +34,14 @@
       hints: [
         'Kunci Sandi Mawar: f(x) = 5x − 1. Untuk mencari huruf asli x, balikkan rumusnya: x = (y + 1) / 5.',
         'Contoh: Angka 79 → (79 + 1) / 5 = 80 / 5 = 16 (Huruf ke-16 kapital: P). Spasi bernilai 0 (angka −1).',
-        'Kata pertama adalah “Pelaku”. Anda juga bisa langsung mengetik hurufnya pada kotak input!'
+        'Perhatikan bahwa huruf kapital bernilai positif (+1 s/d +26), sedangkan huruf kecil bernilai negatif (−1 s/d −26). Anda bisa mengetik angka atau hurufnya langsung!'
       ]
     },
     p2: {
       title: 'Teka-Teki Sandi 2: Kartu Bunga Dua Kelopak',
-      msg: 'Jam Musik Bohong',
+      targetHash: 'f402508b5cea629404e38ca7009eabc706c2c5d971f1a55909b18dccdaf68bbd',
+      cipher: [95, -15, -135, -5, 125, -215, -195, -95, -115, -5, 15, -155, -85, -155, -145, -75],
+      spaces: [3, 9],
       fn: GF,
       img: 'p_kartu_sandi_2_dua_kelopak_x3',
       rule: 'y = (g∘f)(x) = 2(5x − 1) − 3 = 10x − 5',
@@ -50,7 +54,7 @@
       hints: [
         'Ini adalah Fungsi Komposisi dua lapis: (g∘f)(x) = 2(5x − 1) − 3 = 10x − 5.',
         'Rumus Invers Komposisi untuk membalikkan angka: x = (y + 5) / 10.',
-        'Contoh: Angka 95 → (95 + 5) / 10 = 10 (Huruf ke-10 kapital: J). Pesan dimulai dengan “Jam Musik...”.'
+        'Hitung setiap nilai y menggunakan rumus invers komposisi x = (y + 5) / 10, lalu cocokkan dengan Tabel Abjad Sandi Mawar di bawah.'
       ]
     }
   };
@@ -313,6 +317,34 @@
     }
   });
 
+  /* ---------- modul verifikasi & kriptografi (Level 1 SHA-256 + Level 4 Serverless API) ---------- */
+  async function hashText(str) {
+    var norm = (str || '').trim().toUpperCase().replace(/\s+/g, ' ');
+    if (!window.crypto || !window.crypto.subtle) return '';
+    var buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(norm));
+    return Array.from(new Uint8Array(buf))
+      .map(function (b) { return b.toString(16).padStart(2, '0'); })
+      .join('');
+  }
+
+  async function verifyViaServer(targetId, data) {
+    try {
+      var payload = Object.assign({ type: targetId }, data);
+      var resp = await fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (resp.ok) {
+        var resJson = await resp.json();
+        return resJson;
+      }
+    } catch (e) {
+      // Fallback offline / local preview
+    }
+    return null;
+  }
+
   /* ---------- brankas kriptografi kalkulator (AES-256-GCM + PBKDF2) ---------- */
   var CALC_VAULT = {
     salt: 'I/p/6qwbtH+ROT4Ur5eKig==',
@@ -431,7 +463,13 @@
         msg.className = 'calc-lock-msg';
         msg.textContent = 'Memverifikasi...';
 
-        var ok = await verifyCalcPassword(pwd);
+        var ok = false;
+        var srv = await verifyViaServer('calc', { password: pwd });
+        if (srv !== null) {
+          ok = srv.success === true;
+        } else {
+          ok = await verifyCalcPassword(pwd);
+        }
         if (ok) {
           _vaultUnlocked = true;
           _failCount = 0;
@@ -515,7 +553,7 @@
   var curP = null;
   function openPuz(id) {
     var P = PUZ[id];
-    curP = { id: id, P: P, hint: 0, cipher: enc(P.msg, P.fn), solved: false };
+    curP = { id: id, P: P, hint: 0, cipher: P.cipher, solved: false };
     var c = $('puzCard'); c.innerHTML = '';
 
     var h = document.createElement('h2'); h.textContent = P.title; c.appendChild(h);
@@ -531,14 +569,20 @@
     c.appendChild(p);
 
     var cip = document.createElement('div'); cip.className = 'cipher'; cip.id = 'cipher'; c.appendChild(cip);
-    var msg = Array.from(P.msg), wordEl = null;
-    msg.forEach(function (ch, i) {
-      var y = curP.cipher[i];
-      if (!wordEl || ch === ' ') { wordEl = document.createElement('div'); wordEl.className = 'word'; cip.appendChild(wordEl); }
-      var chip = document.createElement('div'); chip.className = 'chip' + (ch === ' ' ? ' sp' : ''); chip.dataset.i = i;
+    var wordEl = null;
+    P.cipher.forEach(function (y, i) {
+      var isSpace = P.spaces && P.spaces.indexOf(i) !== -1;
+      if (!wordEl || isSpace) {
+        wordEl = document.createElement('div');
+        wordEl.className = 'word';
+        cip.appendChild(wordEl);
+      }
+      var chip = document.createElement('div');
+      chip.className = 'chip' + (isSpace ? ' sp' : '');
+      chip.dataset.i = i;
       chip.innerHTML = '<span class="y">' + y + '</span><input type="text" autocomplete="off" aria-label="nilai x untuk angka ' + y + '"><span class="ch"></span><span class="vf"></span>';
       wordEl.appendChild(chip);
-      if (ch === ' ') wordEl = null;
+      if (isSpace) wordEl = null;
       chip.querySelector('input').addEventListener('input', function () { chk(chip, i); });
     });
 
@@ -607,23 +651,43 @@
     finishCheck();
   }
 
-  function finishCheck() {
+  async function finishCheck() {
     if (curP.solved) return;
     var chips = document.querySelectorAll('#cipher .chip'), all = true;
     Array.prototype.forEach.call(chips, function (c) { if (!c.classList.contains('ok')) all = false; });
     if (all) {
-      curP.solved = true;
-      if (typeof GameAudio !== 'undefined') GameAudio.puzzleSolved();
-      var r = $('puzRes'); r.className = 'solved';
-      r.innerHTML = '<div class="muted">Pesan Rahasia Berhasil Dipecahkan!</div><div class="msg">“' + curP.P.msg + '”</div>';
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'primary'; b.textContent = 'Lanjutkan Penyelidikan ▸'; b.style.marginTop = '10px';
-      b.addEventListener('click', function () {
-        $('mPuz').hidden = true;
-        var id = curP.id;
-        if (id === 'p1') afterP1();
-        else afterP2();
-      });
-      r.appendChild(b);
+      // Rekonstruksi pesan teks dari karakter yang dipecahkan
+      var decoded = Array.from(chips).map(function (c) {
+        var inp = c.querySelector('input');
+        var valX = parseNum(inp ? inp.value : '');
+        return valX === 0 ? ' ' : (valX !== null ? chr(valX) : '');
+      }).join('');
+
+      var h = await hashText(decoded);
+      var serverCheck = await verifyViaServer(curP.id, { answer: decoded });
+      var isVerified = false;
+
+      if (serverCheck !== null) {
+        isVerified = serverCheck.success === true;
+      } else {
+        isVerified = h === curP.P.targetHash;
+      }
+
+      if (isVerified) {
+        curP.solved = true;
+        if (typeof GameAudio !== 'undefined') GameAudio.puzzleSolved();
+        var r = $('puzRes'); r.className = 'solved';
+        var displayText = (serverCheck && serverCheck.text) ? serverCheck.text : decoded;
+        r.innerHTML = '<div class="muted">Pesan Rahasia Berhasil Dipecahkan!</div><div class="msg">“' + displayText + '”</div>';
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'primary'; b.textContent = 'Lanjutkan Penyelidikan ▸'; b.style.marginTop = '10px';
+        b.addEventListener('click', function () {
+          $('mPuz').hidden = true;
+          var id = curP.id;
+          if (id === 'p1') afterP1();
+          else afterP2();
+        });
+        r.appendChild(b);
+      }
     }
   }
 
