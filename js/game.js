@@ -488,6 +488,32 @@
   var _lockoutUntil = 0;
   var _lockoutTimer = null;
 
+  var _devAuthorized = false;
+  try {
+    _devAuthorized = sessionStorage.getItem('villa_dev_auth') === 'true';
+  } catch (e) {}
+
+  function ensureDevAuth(cb) {
+    if (_devAuthorized) {
+      cb();
+      return;
+    }
+    var entered = window.prompt('🔐 Fitur Khusus Pembuat / Guru\nMasukkan password akses pembuat:');
+    if (!entered) return;
+    var norm = entered.trim().toLowerCase();
+    var valids = ['guru123', 'admin', 'mawar', 'rahasia', 'villamawar', '1234'];
+    if (valids.indexOf(norm) !== -1) {
+      _devAuthorized = true;
+      try { sessionStorage.setItem('villa_dev_auth', 'true'); } catch (e) {}
+      if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
+      toast('✅ Akses pembuat terverifikasi!');
+      cb();
+    } else {
+      if (typeof GameAudio !== 'undefined') GameAudio.puzzleWrong();
+      window.alert('❌ Password salah! Akses fitur instan ditolak.');
+    }
+  }
+
   function b64ToBuf(b64) {
     var bin = atob(b64), len = bin.length, bytes = new Uint8Array(len);
     for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
@@ -541,7 +567,7 @@
       calc.innerHTML =
         '<div class="calc-lock-header">' +
         '  <b>🔒 Kalkulator</b>' +
-        '  <button type="button" id="calcDevInstantBtn" class="dev-instant-btn" style="background:transparent;border:1px dashed var(--teal);color:var(--teal);padding:2px 8px;font-size:11px;cursor:pointer;margin-left:8px;border-radius:3px;" title="Khusus Pembuat: Buka Instan">⚡ Buka Instan</button>' +
+        '  <button type="button" id="calcDevInstantBtn" class="dev-instant-btn" style="background:transparent;border:1px dashed var(--teal);color:var(--teal);padding:2px 8px;font-size:11px;cursor:pointer;margin-left:8px;border-radius:3px;" title="Khusus Pembuat: Perlu Password Akses">🔒 Buka Instan</button>' +
         '</div>' +
         '<div class="row calc-lock-row">' +
         '  <input id="calcPwd" type="password" placeholder="Masukkan password..." autocomplete="off" aria-label="Password kalkulator">' +
@@ -556,19 +582,23 @@
       if (instantBtn) {
         instantBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          _vaultUnlocked = true;
-          _failCount = 0;
-          _lockoutUntil = 0;
-          clearInterval(_lockoutTimer);
-          if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
-          toast('⚡ Password terbuka instan!');
-          renderCalc(calc, P);
+          ensureDevAuth(function () {
+            _vaultUnlocked = true;
+            _failCount = 0;
+            _lockoutUntil = 0;
+            clearInterval(_lockoutTimer);
+            if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
+            toast('⚡ Password kalkulator terbuka!');
+            renderCalc(calc, P);
+          });
         });
       }
       if (pwdInp) {
         pwdInp.addEventListener('dblclick', function () {
-          pwdInp.value = 'jam dinding';
-          doUnlock();
+          ensureDevAuth(function () {
+            pwdInp.value = 'jam dinding';
+            doUnlock();
+          });
         });
       }
 
@@ -765,7 +795,7 @@
     act.className = 'puz-actions';
     act.innerHTML =
       '<button type="button" class="primary" id="btnCheckPuz">🔍 Periksa Pesan Sandi</button>' +
-      '<button type="button" id="btnDevSolve" class="dev-instant-btn" style="background:transparent;border:1px dashed rgba(220,174,85,0.45);color:var(--amber);font-size:12px;padding:5px 12px;border-radius:4px;cursor:pointer;margin-top:2px;" title="Khusus Pembuat: Jawab Otomatis & Buka Password">⚡ Jawab Instan & Buka Password</button>' +
+      '<button type="button" id="btnDevSolve" class="dev-instant-btn" style="background:transparent;border:1px dashed rgba(220,174,85,0.45);color:var(--amber);font-size:12px;padding:5px 12px;border-radius:4px;cursor:pointer;margin-top:2px;" title="Khusus Pembuat: Perlu Password Akses">🔒 Jawab Instan (Khusus Pembuat)</button>' +
       '<div class="puz-status" id="puzStatus"></div>';
     c.appendChild(act);
     act.querySelector('#btnCheckPuz').addEventListener('click', verifyAllPuz);
@@ -929,28 +959,30 @@
   }
 
   function devInstantSolve() {
-    if (!curP || !curP.P) return;
-    var seq = curP.P.seq;
-    if (!seq) return;
-    var chips = document.querySelectorAll('#cipher .chip');
-    Array.prototype.forEach.call(chips, function (chip, idx) {
-      var inp = chip.querySelector('input');
-      var correctX = seq[idx];
-      if (inp) {
-        inp.value = correctX === 0 ? '␣' : chr(correctX);
-        chk(chip, idx);
-      }
+    ensureDevAuth(function () {
+      if (!curP || !curP.P) return;
+      var seq = curP.P.seq;
+      if (!seq) return;
+      var chips = document.querySelectorAll('#cipher .chip');
+      Array.prototype.forEach.call(chips, function (chip, idx) {
+        var inp = chip.querySelector('input');
+        var correctX = seq[idx];
+        if (inp) {
+          inp.value = correctX === 0 ? '␣' : chr(correctX);
+          chk(chip, idx);
+        }
+      });
+
+      _vaultUnlocked = true;
+      _failCount = 0;
+      _lockoutUntil = 0;
+      clearInterval(_lockoutTimer);
+      var calc = document.querySelector('.calc');
+      if (calc && curP && curP.P) renderCalc(calc, curP.P);
+
+      toast('⚡ Jawaban terisi otomatis & password kalkulator terbuka!');
+      verifyAllPuz();
     });
-
-    _vaultUnlocked = true;
-    _failCount = 0;
-    _lockoutUntil = 0;
-    clearInterval(_lockoutTimer);
-    var calc = document.querySelector('.calc');
-    if (calc && curP && curP.P) renderCalc(calc, curP.P);
-
-    toast('⚡ Jawaban terisi otomatis & password terbuka!');
-    verifyAllPuz();
   }
 
   // Pintasan instan pembuat (F2, Backtick `, atau Alt+J)
@@ -960,26 +992,30 @@
         e.preventDefault();
         devInstantSolve();
       } else {
-        _vaultUnlocked = true;
-        _failCount = 0;
-        _lockoutUntil = 0;
-        clearInterval(_lockoutTimer);
-        var calc = document.querySelector('.calc');
-        if (calc && curP && curP.P) renderCalc(calc, curP.P);
-        toast('⚡ Password kalkulator terbuka!');
+        ensureDevAuth(function () {
+          _vaultUnlocked = true;
+          _failCount = 0;
+          _lockoutUntil = 0;
+          clearInterval(_lockoutTimer);
+          var calc = document.querySelector('.calc');
+          if (calc && curP && curP.P) renderCalc(calc, curP.P);
+          toast('⚡ Password kalkulator terbuka!');
+        });
       }
     }
   });
 
   window.devSolve = devInstantSolve;
   window.unlockCalc = function () {
-    _vaultUnlocked = true;
-    _failCount = 0;
-    _lockoutUntil = 0;
-    clearInterval(_lockoutTimer);
-    var calc = document.querySelector('.calc');
-    if (calc && curP && curP.P) renderCalc(calc, curP.P);
-    toast('⚡ Kalkulator terbuka!');
+    ensureDevAuth(function () {
+      _vaultUnlocked = true;
+      _failCount = 0;
+      _lockoutUntil = 0;
+      clearInterval(_lockoutTimer);
+      var calc = document.querySelector('.calc');
+      if (calc && curP && curP.P) renderCalc(calc, curP.P);
+      toast('⚡ Kalkulator terbuka!');
+    });
   };
 
   /* ---------- alur cerita bertingkat (visual novel MTK) ---------- */
