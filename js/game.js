@@ -124,7 +124,8 @@
       room: 'aula', x: 110, face: 1, f: {}, ev: {}, time: '--.--',
       fade: 0, flash: 0, flashT: 5, t: 0, started: false,
       spk: null, noteT: 0, harin: null, sari: null, callOn: false,
-      memory: false, dawn: false, ending: null
+      memory: false, dawn: false, ending: null,
+      calcUnlocked: false
     };
   }
   newState();
@@ -311,6 +312,157 @@
     }
   });
 
+  /* ---------- brankas kriptografi kalkulator (AES-256-GCM + PBKDF2) ---------- */
+  var CALC_VAULT = {
+    salt: 'EHOtcgLucWSszevX8VxMow==',
+    iv: 'AVzdxIDyW/hG2mT5',
+    data: '7mKQtv0KB01bt8hYYwdk3SeUl5KayG8LDf1G0rQ/9G1JzI6NfBYmOd5aCBMvUrgJiewAT3fgC3o3jHrmkECdqiCtL0s=',
+    iter: 100000
+  };
+
+  function b64ToBuf(b64) {
+    var bin = atob(b64), len = bin.length, bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  async function verifyCalcPassword(pwd) {
+    if (!window.crypto || !window.crypto.subtle) return false;
+    try {
+      var enc = new TextEncoder();
+      var pwKey = await window.crypto.subtle.importKey(
+        'raw',
+        enc.encode(pwd),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveKey']
+      );
+      var key = await window.crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: b64ToBuf(CALC_VAULT.salt),
+          iterations: CALC_VAULT.iter,
+          hash: 'SHA-256'
+        },
+        pwKey,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['decrypt']
+      );
+      var dec = await window.crypto.subtle.decrypt(
+        {
+          name: 'AES-GCM',
+          iv: b64ToBuf(CALC_VAULT.iv),
+          tagLength: 128
+        },
+        key,
+        b64ToBuf(CALC_VAULT.data)
+      );
+      var json = JSON.parse(new TextDecoder().decode(dec));
+      return json && json.unlocked === true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function renderCalc(calc, P) {
+    calc.innerHTML = '';
+    if (!S.calcUnlocked) {
+      calc.className = 'calc locked';
+      calc.innerHTML =
+        '<div class="calc-lock-header">' +
+        '  <b>🔒 Kalkulator Terkunci (Enkripsi AES-256-GCM + PBKDF2)</b>' +
+        '  <span class="calc-lock-desc">Kalkulator otomatis dilindungi password agar mengutamakan hitung mandiri. Masukkan password otorisasi untuk membuka.</span>' +
+        '</div>' +
+        '<div class="row calc-lock-row">' +
+        '  <input id="calcPwd" type="password" placeholder="Masukkan password otorisasi..." autocomplete="off" aria-label="Password kalkulator">' +
+        '  <button type="button" id="calcUnlockBtn">Buka Kunci</button>' +
+        '</div>' +
+        '<div class="calc-lock-msg" id="calcLockMsg"></div>';
+
+      var pwdInp = calc.querySelector('#calcPwd');
+      var btn = calc.querySelector('#calcUnlockBtn');
+      var msg = calc.querySelector('#calcLockMsg');
+
+      var doUnlock = async function () {
+        var pwd = pwdInp.value.trim();
+        if (!pwd) {
+          msg.className = 'calc-lock-msg error';
+          msg.textContent = 'Silakan ketikkan password otorisasi.';
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Memverifikasi...';
+        msg.className = 'calc-lock-msg';
+        msg.textContent = 'Memverifikasi PBKDF2 (100.000 iterasi) & AES-256-GCM...';
+
+        var ok = await verifyCalcPassword(pwd);
+        if (ok) {
+          S.calcUnlocked = true;
+          if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
+          toast('Otorisasi Berhasil! Kalkulator Dibuka.');
+          renderCalc(calc, P);
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Buka Kunci';
+          msg.className = 'calc-lock-msg error';
+          msg.textContent = '❌ Akses Ditolak: Password salah atau verifikasi integritas AES-GCM gagal.';
+          if (typeof GameAudio !== 'undefined') GameAudio.puzzleWrong();
+          pwdInp.value = '';
+          pwdInp.focus();
+        }
+      };
+
+      btn.addEventListener('click', doUnlock);
+      pwdInp.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          doUnlock();
+        }
+      });
+    } else {
+      calc.className = 'calc unlocked';
+      calc.innerHTML =
+        '<div class="calc-lock-header">' +
+        '  <div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '    <b>🔓 Kalkulator Fungsi Invers (Akses Terbuka)</b>' +
+        '    <button type="button" id="calcRelockBtn" style="min-height:26px;padding:2px 8px;font-size:11px;">Kunci Kembali</button>' +
+        '  </div>' +
+        '</div>' +
+        '<div class="row">' +
+        '  <select id="cSel" aria-label="Fungsi"></select>' +
+        '  <input id="cY" type="text" inputmode="numeric" placeholder="Masukkan angka y" aria-label="angka y">' +
+        '  <button type="button" id="cGo">Hitung Invers</button>' +
+        '</div>' +
+        '<div class="res" id="cRes"></div>';
+
+      var relock = calc.querySelector('#calcRelockBtn');
+      if (relock) {
+        relock.addEventListener('click', function () {
+          S.calcUnlocked = false;
+          if (typeof GameAudio !== 'undefined') GameAudio.clickUI();
+          renderCalc(calc, P);
+        });
+      }
+
+      P.calcs.forEach(function (k, i) {
+        var o = document.createElement('option'); o.value = i; o.textContent = k.n; calc.querySelector('#cSel').appendChild(o);
+      });
+      calc.querySelector('#cGo').addEventListener('click', function () {
+        var y = parseNum(calc.querySelector('#cY').value), r = calc.querySelector('#cRes');
+        if (y === null) { r.textContent = 'Masukkan bilangan bulat angka kartu.'; return; }
+        var v = P.calcs[calc.querySelector('#cSel').value].fn(y), vv = Math.round(v * 1e4) / 1e4;
+        if (Number.isInteger(vv) && Math.abs(vv) <= 26) {
+          r.textContent = 'x = ' + vv + (vv === 0 ? '  → Spasi' : '  → Huruf “' + chr(vv) + '”');
+        } else if (Number.isInteger(vv)) {
+          r.textContent = 'x = ' + vv + '. Di luar rentang abjad −26...26.';
+        } else {
+          r.textContent = 'x = ' + vv + '. Hasil pecahan: coba gunakan rumus invers komposisi (g∘f)⁻¹.';
+        }
+      });
+    }
+  }
+
   /* ---------- layar teka-teki sandi ---------- */
   var curP = null;
   function openPuz(id) {
@@ -339,25 +491,10 @@
 
     var res = document.createElement('div'); res.id = 'puzRes'; c.appendChild(res);
 
-    // Kalkulator Invers Otomatis
+    // Kalkulator Invers Otomatis (Dilindungi Enkripsi AES-256-GCM + PBKDF2)
     var calc = document.createElement('div'); calc.className = 'calc';
-    calc.innerHTML = '<b>Kalkulator Fungsi Invers (Bantuan Hitung)</b><div class="row"><select id="cSel" aria-label="Fungsi"></select><input id="cY" type="text" inputmode="numeric" placeholder="Masukkan angka y" aria-label="angka y"><button type="button" id="cGo">Hitung Invers</button></div><div class="res" id="cRes"></div>';
     c.appendChild(calc);
-    P.calcs.forEach(function (k, i) {
-      var o = document.createElement('option'); o.value = i; o.textContent = k.n; calc.querySelector('#cSel').appendChild(o);
-    });
-    calc.querySelector('#cGo').addEventListener('click', function () {
-      var y = parseNum(calc.querySelector('#cY').value), r = calc.querySelector('#cRes');
-      if (y === null) { r.textContent = 'Masukkan bilangan bulat angka kartu.'; return; }
-      var v = P.calcs[calc.querySelector('#cSel').value].fn(y), vv = Math.round(v * 1e4) / 1e4;
-      if (Number.isInteger(vv) && Math.abs(vv) <= 26) {
-        r.textContent = 'x = ' + vv + (vv === 0 ? '  → Spasi' : '  → Huruf “' + chr(vv) + '”');
-      } else if (Number.isInteger(vv)) {
-        r.textContent = 'x = ' + vv + '. Di luar rentang abjad −26...26.';
-      } else {
-        r.textContent = 'x = ' + vv + '. Hasil pecahan: coba gunakan rumus invers komposisi (g∘f)⁻¹.';
-      }
-    });
+    renderCalc(calc, P);
 
     // Tabel Abjad Sandi Mawar
     var d = document.createElement('details'); d.innerHTML = '<summary>Buka Tabel Sandi Mawar (Nilai Tiap Abjad)</summary>';
@@ -662,7 +799,7 @@
       '• Rumus Pembalik (Invers): <b>x = (y + 5) / 10</b><br>' +
       '• <i>Contoh:</i> Angka 95 → (95 + 5)/10 = 10 (Huruf J kapital).</p>' +
       '<p><b>4. Tips Praktis:</b><br>' +
-      '• Gunakan menu <b>Kalkulator sandi</b> di bawah kartu teka-teki untuk menghitung otomatis.<br>' +
+      '• Menu <b>Kalkulator sandi</b> dilindungi password enkripsi AES-256-GCM agar pemain terlatih menghitung mandiri.<br>' +
       '• Anda juga bisa langsung mengetik <b>hurufnya langsung</b> pada kotak teka-teki!</p>' +
       '</div>' +
       '<div class="row"><button type="button" id="hx">Tutup</button></div>';

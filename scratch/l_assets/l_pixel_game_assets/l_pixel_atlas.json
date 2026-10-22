@@ -1,0 +1,441 @@
+{
+  "meta": {
+    "character": "L Lawliet (Death Note)",
+    "style": "16-bit 2D Pixel Art",
+    "cell_size": {
+      "width": 140,
+      "height": 260
+    },
+    "sheet_size": {
+      "width": 840,
+      "height": 1300
+    },
+    "frames": {
+      "walk/walk_frame_01": {
+        "frame": {
+          "x": 23,
+          "y": -2,
+          "w": 93,
+          "h": 252
+        },
+        "cell": {
+          "col": 0,
+          "row": 0,
+          "x": 0,
+          "y": 0,
+          "w": 140,
+          "h": 260
+        },
+        "category": "walk"
+      },
+      "walk/walk_frame_02": {
+        "frame": {
+          "x": 164,
+          "y": -2,
+          "w": 92,
+          "h": 252
+        },
+        "cell": {
+          "col": 1,
+          "row": 0,
+          "x": 140,
+          "y": 0,
+          "w": 140,
+          "h": 260
+        },
+        "category": "walk"
+      },
+      "walk/walk_frame_03": {
+        "frame": {
+          "x": 304,
+          "y": 0,
+          "w": 92,
+          "h": 250
+        },
+        "cell": {
+          "col": 2,
+          "row": 0,
+          "x": 280,
+          "y": 0,
+          "w": 140,
+          "h": 260
+        },
+        "category": "walk"
+      },
+      "walk/walk_frame_04": {
+        "frame": {
+          "x": 444,
+          "y": 0,
+          "w": 92,
+          "h": 250
+        },
+        "cell": {
+          "col": 3,
+          "row": 0,
+          "x": 420,
+          "y": 0,
+          "w": 140,
+          "h": 260
+        },
+        "category": "walk"
+      },
+      "walk/walk_frame_05": {
+        "frame": {
+          "x": 597,
+          "y": 0,
+          "w": 66,
+          "h": 250
+        },
+        "cell": {
+          "col": 4,
+          "row": 0,
+          "x": 560,
+          "y": 0,
+          "w": 140,
+          "h": 260
+        },
+        "category": "walk"
+      },
+      "walk/walk_frame_06": {
+        "frame": {
+          "x": 719,
+          "y": -3,
+          "w": 101,
+          "h": 253
+        },
+        "cell": {
+          "col": 5,
+          "row": 0,
+          "x": 700,
+          "y": 0,
+          "w": 140,
+          "h": 260
+        },
+        "category": "walk"
+      },
+      "walk/walk_frame_07": {
+        "frame": {
+          "x": 31,
+          "y": 259,
+          "w": 78,
+          "h": 251
+        },
+        "cell": {
+          "col": 0,
+          "row": 1,
+          "x": 0,
+          "y": 260,
+          "w": 140,
+          "h": 260
+        },
+        "category": "walk"
+      },
+      "walk/walk_frame_08": {
+        "frame": {
+          "x": 163,
+          "y": 260,
+          "w": 94,
+          "h": 250
+        },
+        "cell": {
+          "col": 1,
+          "row": 1,
+          "x": 140,
+          "y": 260,
+          "w": 140,
+          "h": 260
+        },
+        "category": "walk"
+      },
+      "walk/walk_frame_09": {
+        "frame": {
+          "x": 312,
+          "y": 260,
+          "w": 76,
+          "h": 250
+        },
+        "cell": {
+          "col": 2,
+          "row": 1,
+          "x": 280,
+          "y": 260,
+          "w": 140,
+          "h": 260
+        },
+        "category": "walk"
+      },
+      "walk/walk_frame_10": {
+        "frame": {
+          "x": 439,
+          "y": 257,
+          "w": 102,
+          "h": 253
+        },
+        "cell": {
+          "col": 3,
+          "row": 1,
+          "x": 420,
+          "y": 260,
+          "w": 140,
+          "h": 260
+        },
+        "category": "walk"
+      },
+      "idle/idle_turn_01": {
+        "frame": {
+          "x": 583,
+          "y": 325,
+          "w": 93,
+          "h": 185
+        },
+        "cell": {
+          "col": 4,
+          "row": 1,
+          "x": 560,
+          "y": 260,
+          "w": 140,
+          "h": 260
+        },
+        "category": "idle"
+      },
+      "idle/idle_turn_02": {
+        "frame": {
+          "x": 726,
+          "y": 325,
+          "w": 87,
+          "h": 185
+        },
+        "cell": {
+          "col": 5,
+          "row": 1,
+          "x": 700,
+          "y": 260,
+          "w": 140,
+          "h": 260
+        },
+        "category": "idle"
+      },
+      "idle/idle_turn_03": {
+        "frame": {
+          "x": 25,
+          "y": 585,
+          "w": 89,
+          "h": 185
+        },
+        "cell": {
+          "col": 0,
+          "row": 2,
+          "x": 0,
+          "y": 520,
+          "w": 140,
+          "h": 260
+        },
+        "category": "idle"
+      },
+      "idle/idle_turn_04": {
+        "frame": {
+          "x": 162,
+          "y": 585,
+          "w": 96,
+          "h": 185
+        },
+        "cell": {
+          "col": 1,
+          "row": 2,
+          "x": 140,
+          "y": 520,
+          "w": 140,
+          "h": 260
+        },
+        "category": "idle"
+      },
+      "idle/idle_turn_05": {
+        "frame": {
+          "x": 306,
+          "y": 585,
+          "w": 87,
+          "h": 185
+        },
+        "cell": {
+          "col": 2,
+          "row": 2,
+          "x": 280,
+          "y": 520,
+          "w": 140,
+          "h": 260
+        },
+        "category": "idle"
+      },
+      "actions/crouch_eating_04": {
+        "frame": {
+          "x": 424,
+          "y": 562,
+          "w": 131,
+          "h": 208
+        },
+        "cell": {
+          "col": 3,
+          "row": 2,
+          "x": 420,
+          "y": 520,
+          "w": 140,
+          "h": 260
+        },
+        "category": "actions"
+      },
+      "actions/crouch_laptop_05": {
+        "frame": {
+          "x": 542,
+          "y": 559,
+          "w": 175,
+          "h": 211
+        },
+        "cell": {
+          "col": 4,
+          "row": 2,
+          "x": 560,
+          "y": 520,
+          "w": 140,
+          "h": 260
+        },
+        "category": "actions"
+      },
+      "actions/crouch_ponder_02": {
+        "frame": {
+          "x": 703,
+          "y": 562,
+          "w": 133,
+          "h": 208
+        },
+        "cell": {
+          "col": 5,
+          "row": 2,
+          "x": 700,
+          "y": 520,
+          "w": 140,
+          "h": 260
+        },
+        "category": "actions"
+      },
+      "actions/crouch_sit_01": {
+        "frame": {
+          "x": -1,
+          "y": 824,
+          "w": 141,
+          "h": 206
+        },
+        "cell": {
+          "col": 0,
+          "row": 3,
+          "x": 0,
+          "y": 780,
+          "w": 140,
+          "h": 260
+        },
+        "category": "actions"
+      },
+      "actions/crouch_thumb_lip_03": {
+        "frame": {
+          "x": 142,
+          "y": 822,
+          "w": 136,
+          "h": 208
+        },
+        "cell": {
+          "col": 1,
+          "row": 3,
+          "x": 140,
+          "y": 780,
+          "w": 140,
+          "h": 260
+        },
+        "category": "actions"
+      },
+      "items/item_l_coffee_mug": {
+        "frame": {
+          "x": 314,
+          "y": 977,
+          "w": 71,
+          "h": 53
+        },
+        "cell": {
+          "col": 2,
+          "row": 3,
+          "x": 280,
+          "y": 780,
+          "w": 140,
+          "h": 260
+        },
+        "category": "items"
+      },
+      "items/item_laptop": {
+        "frame": {
+          "x": 446,
+          "y": 954,
+          "w": 87,
+          "h": 76
+        },
+        "cell": {
+          "col": 3,
+          "row": 3,
+          "x": 420,
+          "y": 780,
+          "w": 140,
+          "h": 260
+        },
+        "category": "items"
+      },
+      "items/item_strawberry_cake": {
+        "frame": {
+          "x": 597,
+          "y": 968,
+          "w": 66,
+          "h": 62
+        },
+        "cell": {
+          "col": 4,
+          "row": 3,
+          "x": 560,
+          "y": 780,
+          "w": 140,
+          "h": 260
+        },
+        "category": "items"
+      },
+      "items/item_sugar_cube": {
+        "frame": {
+          "x": 729,
+          "y": 962,
+          "w": 82,
+          "h": 68
+        },
+        "cell": {
+          "col": 5,
+          "row": 3,
+          "x": 700,
+          "y": 780,
+          "w": 140,
+          "h": 260
+        },
+        "category": "items"
+      },
+      "items/item_tea_cup": {
+        "frame": {
+          "x": 41,
+          "y": 1228,
+          "w": 58,
+          "h": 62
+        },
+        "cell": {
+          "col": 0,
+          "row": 4,
+          "x": 0,
+          "y": 1040,
+          "w": 140,
+          "h": 260
+        },
+        "category": "items"
+      }
+    }
+  }
+}
