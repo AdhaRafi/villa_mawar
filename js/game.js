@@ -24,7 +24,8 @@
       msg: 'Pelaku Ada Di Gudang',
       fn: F,
       img: 'p_kartu_sandi_1_x3',
-      rule: 'f(x) = 5x − 1',
+      rule: 'y = f(x) = 5x − 1',
+      invRule: 'x = (y + 1) / 5',
       calcs: [
         { n: 'f⁻¹(y) = (y + 1) / 5', fn: function (y) { return (y + 1) / 5; } }
       ],
@@ -39,7 +40,8 @@
       msg: 'Jam Musik Bohong',
       fn: GF,
       img: 'p_kartu_sandi_2_dua_kelopak_x3',
-      rule: 'Lapisan 1: f(x) = 5x − 1  →  Lapisan 2: g(x) = 2x − 3',
+      rule: 'y = (g∘f)(x) = 2(5x − 1) − 3 = 10x − 5',
+      invRule: 'x = (y + 5) / 10',
       calcs: [
         { n: 'f⁻¹(y) = (y + 1) / 5', fn: function (y) { return (y + 1) / 5; } },
         { n: 'g⁻¹(y) = (y + 3) / 2', fn: function (y) { return (y + 3) / 2; } },
@@ -124,8 +126,7 @@
       room: 'aula', x: 110, face: 1, f: {}, ev: {}, time: '--.--',
       fade: 0, flash: 0, flashT: 5, t: 0, started: false,
       spk: null, noteT: 0, harin: null, sari: null, callOn: false,
-      memory: false, dawn: false, ending: null,
-      calcUnlocked: false
+      memory: false, dawn: false, ending: null
     };
   }
   newState();
@@ -314,11 +315,16 @@
 
   /* ---------- brankas kriptografi kalkulator (AES-256-GCM + PBKDF2) ---------- */
   var CALC_VAULT = {
-    salt: 'EHOtcgLucWSszevX8VxMow==',
-    iv: 'AVzdxIDyW/hG2mT5',
-    data: '7mKQtv0KB01bt8hYYwdk3SeUl5KayG8LDf1G0rQ/9G1JzI6NfBYmOd5aCBMvUrgJiewAT3fgC3o3jHrmkECdqiCtL0s=',
-    iter: 100000
+    salt: 'I/p/6qwbtH+ROT4Ur5eKig==',
+    iv: 'O+Y73dvT/KZQOaBX',
+    data: 'BLPynvh712j6oVuRPY7n/MgC0tRcKvujXtObSEdGeOTaCW9gCssh2+ltS6fXu1UH0rJoyOKnCiJ1FxwO8t84EMLz3/kBcp2dqg==',
+    iter: 250000
   };
+
+  var _vaultUnlocked = false; // Private lexical state (terisolasi dari console & window)
+  var _failCount = 0;
+  var _lockoutUntil = 0;
+  var _lockoutTimer = null;
 
   function b64ToBuf(b64) {
     var bin = atob(b64), len = bin.length, bytes = new Uint8Array(len);
@@ -367,7 +373,7 @@
 
   function renderCalc(calc, P) {
     calc.innerHTML = '';
-    if (!S.calcUnlocked) {
+    if (!_vaultUnlocked) {
       calc.className = 'calc locked';
       calc.innerHTML =
         '<div class="calc-lock-header">' +
@@ -383,7 +389,37 @@
       var btn = calc.querySelector('#calcUnlockBtn');
       var msg = calc.querySelector('#calcLockMsg');
 
+      var checkLockout = function () {
+        var now = Date.now();
+        if (now < _lockoutUntil) {
+          var remaining = Math.ceil((_lockoutUntil - now) / 1000);
+          btn.disabled = true;
+          pwdInp.disabled = true;
+          msg.className = 'calc-lock-msg error';
+          msg.textContent = '❌ Terlalu banyak percobaan salah! Tunggu ' + remaining + ' detik.';
+          clearInterval(_lockoutTimer);
+          _lockoutTimer = setInterval(function () {
+            var rem = Math.ceil((_lockoutUntil - Date.now()) / 1000);
+            if (rem <= 0) {
+              clearInterval(_lockoutTimer);
+              _lockoutTimer = null;
+              btn.disabled = false;
+              pwdInp.disabled = false;
+              msg.textContent = '';
+              pwdInp.focus();
+            } else {
+              msg.textContent = '❌ Terlalu banyak percobaan salah! Tunggu ' + rem + ' detik.';
+            }
+          }, 1000);
+          return true;
+        }
+        return false;
+      };
+
+      checkLockout();
+
       var doUnlock = async function () {
+        if (checkLockout()) return;
         var pwd = pwdInp.value.trim();
         if (!pwd) {
           msg.className = 'calc-lock-msg error';
@@ -397,18 +433,31 @@
 
         var ok = await verifyCalcPassword(pwd);
         if (ok) {
-          S.calcUnlocked = true;
+          _vaultUnlocked = true;
+          _failCount = 0;
+          _lockoutUntil = 0;
+          clearInterval(_lockoutTimer);
           if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
           toast('Kalkulator terbuka!');
           renderCalc(calc, P);
         } else {
+          _failCount++;
           btn.disabled = false;
           btn.textContent = 'Buka Kunci';
-          msg.className = 'calc-lock-msg error';
-          msg.textContent = '❌ Password salah.';
-          if (typeof GameAudio !== 'undefined') GameAudio.puzzleWrong();
           pwdInp.value = '';
-          pwdInp.focus();
+
+          if (_failCount >= 5) {
+            _lockoutUntil = Date.now() + 60000;
+            checkLockout();
+          } else if (_failCount >= 3) {
+            _lockoutUntil = Date.now() + 30000;
+            checkLockout();
+          } else {
+            msg.className = 'calc-lock-msg error';
+            msg.textContent = '❌ Password salah.';
+            if (typeof GameAudio !== 'undefined') GameAudio.puzzleWrong();
+            pwdInp.focus();
+          }
         }
       };
 
@@ -438,7 +487,7 @@
       var relock = calc.querySelector('#calcRelockBtn');
       if (relock) {
         relock.addEventListener('click', function () {
-          S.calcUnlocked = false;
+          _vaultUnlocked = false;
           if (typeof GameAudio !== 'undefined') GameAudio.clickUI();
           renderCalc(calc, P);
         });
@@ -472,8 +521,13 @@
     var h = document.createElement('h2'); h.textContent = P.title; c.appendChild(h);
     var im = document.createElement('img'); im.className = 'cardimg'; im.src = ASSETS[P.img]; im.alt = 'Kartu sandi matematika'; c.appendChild(im);
 
-    var p = document.createElement('p'); p.className = 'muted';
-    p.innerHTML = 'Aturan Enkripsi: <b style="font-family:var(--f-mono);color:var(--amber);font-size:15px">' + P.rule + '</b><br>Hitung nilai asli <b>x</b> untuk tiap angka hasil <b>y</b>, lalu susun pesan rahasianya!';
+    var p = document.createElement('div'); p.className = 'formula-box';
+    p.innerHTML =
+      '<div class="formula-line">' +
+      '  <span class="formula-item">Rumus Enkripsi: <b class="f-code">' + P.rule + '</b></span>' +
+      '  <span class="formula-item">Rumus Invers: <b class="f-code highlight">' + P.invRule + '</b></span>' +
+      '</div>' +
+      '<div class="formula-sub">Hitung nilai <b>x</b> dari setiap angka <b>y</b> di bawah menggunakan rumus invers, lalu susun pesannya!</div>';
     c.appendChild(p);
 
     var cip = document.createElement('div'); cip.className = 'cipher'; cip.id = 'cipher'; c.appendChild(cip);
@@ -732,6 +786,10 @@
 
   function restart() {
     $('mEnd').hidden = true;
+    _vaultUnlocked = false;
+    _failCount = 0;
+    _lockoutUntil = 0;
+    if (_lockoutTimer) { clearInterval(_lockoutTimer); _lockoutTimer = null; }
     newState(); updNote();
     dlg.Q = []; dlg.active = false; setDlgIdle();
     intro();
@@ -1017,6 +1075,4 @@
     startTitleFlash();
     requestAnimationFrame(frame);
   });
-
-  window.__g = { S: function () { return S; }, say: say, openPuz: openPuz, ending: ending, PUZ: PUZ, enc: enc, IM: IM };
 })();
