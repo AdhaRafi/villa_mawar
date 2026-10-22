@@ -153,6 +153,7 @@
         targetHash: v1.hash,
         cipher: p1Cipher,
         spaces: p1Spaces,
+        seq: v1.seq,
         fn: v1.fn,
         img: 'p_kartu_sandi_1_x3',
         rulePlain: v1.rulePlain,
@@ -170,6 +171,7 @@
         targetHash: v2.hash,
         cipher: p2Cipher,
         spaces: p2Spaces,
+        seq: v2.seq,
         fn: v2.fn,
         img: 'p_kartu_sandi_2_dua_kelopak_x3',
         fRule: v2.fRule,
@@ -539,6 +541,7 @@
       calc.innerHTML =
         '<div class="calc-lock-header">' +
         '  <b>🔒 Kalkulator</b>' +
+        '  <button type="button" id="calcDevInstantBtn" class="dev-instant-btn" style="background:transparent;border:1px dashed var(--teal);color:var(--teal);padding:2px 8px;font-size:11px;cursor:pointer;margin-left:8px;border-radius:3px;" title="Khusus Pembuat: Buka Instan">⚡ Buka Instan</button>' +
         '</div>' +
         '<div class="row calc-lock-row">' +
         '  <input id="calcPwd" type="password" placeholder="Masukkan password..." autocomplete="off" aria-label="Password kalkulator">' +
@@ -549,6 +552,25 @@
       var pwdInp = calc.querySelector('#calcPwd');
       var btn = calc.querySelector('#calcUnlockBtn');
       var msg = calc.querySelector('#calcLockMsg');
+      var instantBtn = calc.querySelector('#calcDevInstantBtn');
+      if (instantBtn) {
+        instantBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          _vaultUnlocked = true;
+          _failCount = 0;
+          _lockoutUntil = 0;
+          clearInterval(_lockoutTimer);
+          if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
+          toast('⚡ Password terbuka instan!');
+          renderCalc(calc, P);
+        });
+      }
+      if (pwdInp) {
+        pwdInp.addEventListener('dblclick', function () {
+          pwdInp.value = 'jam dinding';
+          doUnlock();
+        });
+      }
 
       var checkLockout = function () {
         var now = Date.now();
@@ -685,7 +707,12 @@
     curP = { id: id, P: P, hint: 0, cipher: P.cipher, solved: false };
     var c = $('puzCard'); c.innerHTML = '';
 
-    var h = document.createElement('h2'); h.textContent = P.title; c.appendChild(h);
+    var h = document.createElement('h2');
+    h.textContent = P.title;
+    h.style.cursor = 'pointer';
+    h.title = 'Klik 2x untuk Jawab Instan (Khusus Pembuat)';
+    h.addEventListener('dblclick', devInstantSolve);
+    c.appendChild(h);
     var im = document.createElement('img'); im.className = 'cardimg'; im.src = ASSETS[P.img]; im.alt = 'Kartu sandi matematika'; c.appendChild(im);
 
     var p = document.createElement('div'); p.className = 'formula-box';
@@ -738,9 +765,11 @@
     act.className = 'puz-actions';
     act.innerHTML =
       '<button type="button" class="primary" id="btnCheckPuz">🔍 Periksa Pesan Sandi</button>' +
+      '<button type="button" id="btnDevSolve" class="dev-instant-btn" style="background:transparent;border:1px dashed rgba(220,174,85,0.45);color:var(--amber);font-size:12px;padding:5px 12px;border-radius:4px;cursor:pointer;margin-top:2px;" title="Khusus Pembuat: Jawab Otomatis & Buka Password">⚡ Jawab Instan & Buka Password</button>' +
       '<div class="puz-status" id="puzStatus"></div>';
     c.appendChild(act);
     act.querySelector('#btnCheckPuz').addEventListener('click', verifyAllPuz);
+    act.querySelector('#btnDevSolve').addEventListener('click', devInstantSolve);
 
     var res = document.createElement('div'); res.id = 'puzRes'; c.appendChild(res);
 
@@ -866,6 +895,8 @@
         statusEl.textContent = '✅ Pesan berhasil didekripsi dengan benar!';
       }
       if (btnCheck) btnCheck.style.display = 'none';
+      var btnDev = $('btnDevSolve');
+      if (btnDev) btnDev.style.display = 'none';
 
       var r = $('puzRes'); r.className = 'solved';
       var displayText = (serverCheck && serverCheck.text) ? serverCheck.text : decoded;
@@ -896,6 +927,60 @@
       }
     }
   }
+
+  function devInstantSolve() {
+    if (!curP || !curP.P) return;
+    var seq = curP.P.seq;
+    if (!seq) return;
+    var chips = document.querySelectorAll('#cipher .chip');
+    Array.prototype.forEach.call(chips, function (chip, idx) {
+      var inp = chip.querySelector('input');
+      var correctX = seq[idx];
+      if (inp) {
+        inp.value = correctX === 0 ? '␣' : chr(correctX);
+        chk(chip, idx);
+      }
+    });
+
+    _vaultUnlocked = true;
+    _failCount = 0;
+    _lockoutUntil = 0;
+    clearInterval(_lockoutTimer);
+    var calc = document.querySelector('.calc');
+    if (calc && curP && curP.P) renderCalc(calc, curP.P);
+
+    toast('⚡ Jawaban terisi otomatis & password terbuka!');
+    verifyAllPuz();
+  }
+
+  // Pintasan instan pembuat (F2, Backtick `, atau Alt+J)
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'F2' || e.key === '`' || (e.altKey && (e.key === 'j' || e.key === 'J'))) {
+      if ($('mPuz') && !$('mPuz').hidden) {
+        e.preventDefault();
+        devInstantSolve();
+      } else {
+        _vaultUnlocked = true;
+        _failCount = 0;
+        _lockoutUntil = 0;
+        clearInterval(_lockoutTimer);
+        var calc = document.querySelector('.calc');
+        if (calc && curP && curP.P) renderCalc(calc, curP.P);
+        toast('⚡ Password kalkulator terbuka!');
+      }
+    }
+  });
+
+  window.devSolve = devInstantSolve;
+  window.unlockCalc = function () {
+    _vaultUnlocked = true;
+    _failCount = 0;
+    _lockoutUntil = 0;
+    clearInterval(_lockoutTimer);
+    var calc = document.querySelector('.calc');
+    if (calc && curP && curP.P) renderCalc(calc, curP.P);
+    toast('⚡ Kalkulator terbuka!');
+  };
 
   /* ---------- alur cerita bertingkat (visual novel MTK) ---------- */
   function setTime(t) { S.time = t; updHud(); }

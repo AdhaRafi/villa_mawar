@@ -814,6 +814,21 @@ canvas {
   animation: puzShake 0.4s ease;
 }
 
+.dev-instant-btn {
+  transition: opacity 0.2s, transform 0.15s, background-color 0.2s;
+  cursor: pointer;
+}
+
+.dev-instant-btn:hover {
+  opacity: 1 !important;
+  transform: scale(1.02);
+  background: rgba(220, 174, 85, 0.15) !important;
+}
+
+.dev-instant-btn:active {
+  transform: scale(0.98);
+}
+
 .solved {
   border: 2px solid var(--ok);
   border-radius: 4px;
