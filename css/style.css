@@ -54,10 +54,21 @@ header {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--f-display);
   font-weight: 700;
   font-size: clamp(16px, 3.8vw, 20px);
   letter-spacing: .02em;
+}
+
+.brand-logo {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 6px rgba(224, 76, 102, 0.5));
 }
 
 .brand span {
