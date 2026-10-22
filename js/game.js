@@ -18,46 +18,173 @@
     return Array.from(m).map(function (c) { return fn(val(c)); });
   }
 
-  var PUZ = {
-    p1: {
-      title: 'Teka-Teki Sandi 1: Kartu di Bawah Cangkir',
-      targetHash: '70ae516fc15fc64ea455cb21ebeb19354c9a384b9e0b15c7a63e7b1f642c675c',
-      cipher: [79, -26, -61, -6, -56, -106, -1, 4, -21, -6, -1, 19, -46, -1, 34, -106, -21, -6, -71, -36],
-      spaces: [6, 10, 13],
-      fn: F,
-      img: 'p_kartu_sandi_1_x3',
+  /* ---------- katalog variasi teka-teki dinamis (f(x), g(x), kalimat berganti acak) ---------- */
+  var P1_VARIANTS = [
+    {
+      seq: [16, -5, -12, -1, -11, -21, 0, 1, -4, -1, 0, 4, -9, 0, 7, -21, -4, -1, -14, -7],
+      hash: '70ae516fc15fc64ea455cb21ebeb19354c9a384b9e0b15c7a63e7b1f642c675c',
+      rulePlain: 'f(x) = 5x − 1',
       rule: 'y = f(x) = 5x − 1',
       invRule: 'x = (y + 1) / 5',
+      fn: function (x) { return 5 * x - 1; },
       calcs: [
         { n: 'f⁻¹(y) = (y + 1) / 5', fn: function (y) { return (y + 1) / 5; } }
-      ],
-      hints: [
-        'Kunci Sandi Mawar: f(x) = 5x − 1. Untuk mencari huruf asli x, balikkan rumusnya: x = (y + 1) / 5.',
-        'Contoh: Angka 79 → (79 + 1) / 5 = 80 / 5 = 16 (Huruf ke-16 kapital: P). Spasi bernilai 0 (angka −1).',
-        'Perhatikan bahwa huruf kapital bernilai positif (+1 s/d +26), sedangkan huruf kecil bernilai negatif (−1 s/d −26). Anda bisa mengetik angka atau hurufnya langsung!'
       ]
     },
-    p2: {
-      title: 'Teka-Teki Sandi 2: Kartu Bunga Dua Kelopak',
-      targetHash: 'e1aae1b326135b2b682e6cd7b35efb648e14b82faa6c5cecf41490f9456397da',
-      cipher: [95, -15, -135, -5, 35, -95, -145, -45, -95, -145, -75, -5, 15, -155, -85, -155, -145, -75],
-      spaces: [3, 11],
-      fn: GF,
-      img: 'p_kartu_sandi_2_dua_kelopak_x3',
+    {
+      seq: [16, -5, -18, -9, -11, -19, -1, 0, 7, -21, -4, -1, -14, -7, 0, 2, -5, -12, -1, -11, -1, -14, -7],
+      hash: '680723f6849f0b9d3ea95770cb9517e8c6815f28e33e83d06c28f6cbfa7e7f97',
+      rulePlain: 'f(x) = 3x + 2',
+      rule: 'y = f(x) = 3x + 2',
+      invRule: 'x = (y − 2) / 3',
+      fn: function (x) { return 3 * x + 2; },
+      calcs: [
+        { n: 'f⁻¹(y) = (y − 2) / 3', fn: function (y) { return (y - 2) / 3; } }
+      ]
+    },
+    {
+      seq: [2, -21, -11, -20, -9, 0, 1, -4, -1, 0, 4, -9, 0, 7, -21, -4, -1, -14, -7],
+      hash: '440416a23195f6a747677d23171d76777e8f76665bf64041876a373fba5c5632',
+      rulePlain: 'f(x) = 4x − 3',
+      rule: 'y = f(x) = 4x − 3',
+      invRule: 'x = (y + 3) / 4',
+      fn: function (x) { return 4 * x - 3; },
+      calcs: [
+        { n: 'f⁻¹(y) = (y + 3) / 4', fn: function (y) { return (y + 3) / 4; } }
+      ]
+    },
+    {
+      seq: [3, -1, -18, -9, 0, 16, -5, -20, -21, -14, -10, -21, -11, 0, 4, -9, 0, 7, -21, -4, -1, -14, -7],
+      hash: '88731bd9d728a7864cb3b5741d718e2b938888fa0720a039ad6813c05b3ba72e',
+      rulePlain: 'f(x) = 2x + 7',
+      rule: 'y = f(x) = 2x + 7',
+      invRule: 'x = (y − 7) / 2',
+      fn: function (x) { return 2 * x + 7; },
+      calcs: [
+        { n: 'f⁻¹(y) = (y − 7) / 2', fn: function (y) { return (y - 7) / 2; } }
+      ]
+    }
+  ];
+
+  var P2_VARIANTS = [
+    {
+      seq: [10, -1, -13, 0, 4, -9, -14, -4, -9, -14, -7, 0, 2, -15, -8, -15, -14, -7],
+      hash: 'e1aae1b326135b2b682e6cd7b35efb648e14b82faa6c5cecf41490f9456397da',
+      fRule: 'f(x) = 5x − 1',
+      gRule: 'g(x) = 2x − 3',
       rule: 'y = (g∘f)(x) = 2(5x − 1) − 3 = 10x − 5',
       invRule: 'x = (y + 5) / 10',
+      fn: function (x) { return 10 * x - 5; },
       calcs: [
         { n: 'f⁻¹(y) = (y + 1) / 5', fn: function (y) { return (y + 1) / 5; } },
         { n: 'g⁻¹(y) = (y + 3) / 2', fn: function (y) { return (y + 3) / 2; } },
         { n: '(g∘f)⁻¹(y) = (y + 5) / 10', fn: function (y) { return (y + 5) / 10; } }
-      ],
-      hints: [
-        'Ini adalah Fungsi Komposisi dua lapis: (g∘f)(x) = 2(5x − 1) − 3 = 10x − 5.',
-        'Rumus Invers Komposisi untuk membalikkan angka: x = (y + 5) / 10.',
-        'Hitung setiap nilai y menggunakan rumus invers komposisi x = (y + 5) / 10, lalu cocokkan dengan Tabel Abjad Sandi Mawar di bawah.'
+      ]
+    },
+    {
+      seq: [23, -1, -11, -20, -21, 0, 11, -5, -13, -1, -20, -9, -1, -14, 0, 16, -1, -12, -19, -21],
+      hash: '9f58f683b957d51036633bd69bef53a32f45e2ab03a826b2d4ea08ac7b677281',
+      fRule: 'f(x) = 3x + 2',
+      gRule: 'g(x) = 2x − 1',
+      rule: 'y = (g∘f)(x) = 2(3x + 2) − 1 = 6x + 3',
+      invRule: 'x = (y − 3) / 6',
+      fn: function (x) { return 6 * x + 3; },
+      calcs: [
+        { n: 'f⁻¹(y) = (y − 2) / 3', fn: function (y) { return (y - 2) / 3; } },
+        { n: 'g⁻¹(y) = (y + 1) / 2', fn: function (y) { return (y + 1) / 2; } },
+        { n: '(g∘f)⁻¹(y) = (y − 3) / 6', fn: function (y) { return (y - 3) / 6; } }
+      ]
+    },
+    {
+      seq: [1, -12, -9, -2, -9, 0, 10, -1, -13, 0, 4, -9, -14, -4, -9, -14, -7, 0, 16, -1, -12, -19, -21],
+      hash: 'c1938e7db161c40f3e2a7c15f50270816f2934e1752e0a84f0befb64eea0638e',
+      fRule: 'f(x) = 2x + 1',
+      gRule: 'g(x) = 3x − 2',
+      rule: 'y = (g∘f)(x) = 3(2x + 1) − 2 = 6x + 1',
+      invRule: 'x = (y − 1) / 6',
+      fn: function (x) { return 6 * x + 1; },
+      calcs: [
+        { n: 'f⁻¹(y) = (y − 1) / 2', fn: function (y) { return (y - 1) / 2; } },
+        { n: 'g⁻¹(y) = (y + 2) / 3', fn: function (y) { return (y + 2) / 3; } },
+        { n: '(g∘f)⁻¹(y) = (y − 1) / 6', fn: function (y) { return (y - 1) / 6; } }
+      ]
+    },
+    {
+      seq: [10, -1, -13, 0, 13, -21, -19, -9, -11, 0, 4, -9, -18, -5, -11, -1, -25, -1, -19, -1],
+      hash: '329ddf85f29eb27a7f6ab76e88add155903ecef79b1950d87d9bda05156ff3e5',
+      fRule: 'f(x) = 4x − 1',
+      gRule: 'g(x) = 2x + 3',
+      rule: 'y = (g∘f)(x) = 2(4x − 1) + 3 = 8x + 1',
+      invRule: 'x = (y − 1) / 8',
+      fn: function (x) { return 8 * x + 1; },
+      calcs: [
+        { n: 'f⁻¹(y) = (y + 1) / 4', fn: function (y) { return (y + 1) / 4; } },
+        { n: 'g⁻¹(y) = (y − 3) / 2', fn: function (y) { return (y - 3) / 2; } },
+        { n: '(g∘f)⁻¹(y) = (y − 1) / 8', fn: function (y) { return (y - 1) / 8; } }
       ]
     }
-  };
+  ];
+
+  var PUZ = {};
+
+  function initRandomPuzzles() {
+    var v1 = P1_VARIANTS[Math.floor(Math.random() * P1_VARIANTS.length)];
+    var v2 = P2_VARIANTS[Math.floor(Math.random() * P2_VARIANTS.length)];
+
+    var p1Cipher = v1.seq.map(function (x) { return v1.fn(x); });
+    var p1Spaces = [];
+    v1.seq.forEach(function (x, i) { if (x === 0) p1Spaces.push(i); });
+
+    var p2Cipher = v2.seq.map(function (x) { return v2.fn(x); });
+    var p2Spaces = [];
+    v2.seq.forEach(function (x, i) { if (x === 0) p2Spaces.push(i); });
+
+    var firstCharX1 = v1.seq[0];
+    var firstY1 = v1.fn(firstCharX1);
+    var firstChr1 = chr(firstCharX1);
+
+    var firstCharX2 = v2.seq[0];
+    var firstY2 = v2.fn(firstCharX2);
+    var firstChr2 = chr(firstCharX2);
+
+    PUZ = {
+      p1: {
+        title: 'Teka-Teki Sandi 1: Kartu di Bawah Cangkir',
+        targetHash: v1.hash,
+        cipher: p1Cipher,
+        spaces: p1Spaces,
+        fn: v1.fn,
+        img: 'p_kartu_sandi_1_x3',
+        rulePlain: v1.rulePlain,
+        rule: v1.rule,
+        invRule: v1.invRule,
+        calcs: v1.calcs,
+        hints: [
+          'Kunci Enkripsi: ' + v1.rulePlain + '. Untuk mencari plainteks x, gunakan fungsi dekripsi: ' + v1.invRule + '.',
+          'Contoh: Angka ' + firstY1 + ' → dihitung dengan rumus invers menghasilkan x = ' + firstCharX1 + ' (Huruf ' + firstChr1 + '). Spasi bernilai 0.',
+          'Huruf kapital bernilai positif (+1 s/d +26), huruf kecil negatif (−1 s/d −26). Tekan SPASI pada kotak bertanda ␣ untuk memisahkan kata!'
+        ]
+      },
+      p2: {
+        title: 'Teka-Teki Sandi 2: Kartu Bunga Dua Kelopak',
+        targetHash: v2.hash,
+        cipher: p2Cipher,
+        spaces: p2Spaces,
+        fn: v2.fn,
+        img: 'p_kartu_sandi_2_dua_kelopak_x3',
+        fRule: v2.fRule,
+        gRule: v2.gRule,
+        rule: v2.rule,
+        invRule: v2.invRule,
+        calcs: v2.calcs,
+        hints: [
+          'Enkripsi Lapis Ganda: ' + v2.rule + '.',
+          'Gunakan rumus Invers Komposisi untuk membalikkan angka: ' + v2.invRule + '.',
+          'Contoh: Angka ' + firstY2 + ' → dihitung dengan rumus invers menghasilkan x = ' + firstCharX2 + ' (Huruf ' + firstChr2 + '). Tekan tombol SPASI pada kotak bertanda ␣.'
+        ]
+      }
+    };
+  }
 
   /* ---------- aset visual ---------- */
   var IM = {};
@@ -132,6 +259,7 @@
       spk: null, noteT: 0, harin: null, sari: null, callOn: false,
       memory: false, dawn: false, ending: null
     };
+    initRandomPuzzles();
   }
   newState();
 
@@ -581,10 +709,25 @@
       var chip = document.createElement('div');
       chip.className = 'chip' + (isSpace ? ' sp' : '');
       chip.dataset.i = i;
-      chip.innerHTML = '<span class="y">' + y + '</span><input type="text" autocomplete="off" aria-label="nilai x untuk angka ' + y + '"><span class="ch"></span><span class="vf"></span>';
+      var ph = isSpace ? '␣' : '';
+      chip.innerHTML = '<span class="y">' + y + '</span><input type="text" autocomplete="off" placeholder="' + ph + '" aria-label="' + (isSpace ? 'spasi (tekan spasi atau 0)' : 'nilai x untuk angka ' + y) + '"><span class="ch"></span><span class="vf"></span>';
       wordEl.appendChild(chip);
       if (isSpace) wordEl = null;
-      chip.querySelector('input').addEventListener('input', function () { chk(chip, i); });
+
+      var inp = chip.querySelector('input');
+      inp.addEventListener('input', function () { chk(chip, i); });
+      inp.addEventListener('keydown', function (e) {
+        if (e.key === ' ' || e.code === 'Space') {
+          e.preventDefault();
+          inp.value = '␣';
+          chk(chip, i);
+          var nextChip = cip.querySelector('.chip[data-i="' + (i + 1) + '"] input');
+          if (nextChip) nextChip.focus();
+        } else if (e.key === 'Enter') {
+          var nextInp = cip.querySelector('.chip[data-i="' + (i + 1) + '"] input');
+          if (nextInp) nextInp.focus();
+        }
+      });
     });
 
     var res = document.createElement('div'); res.id = 'puzRes'; c.appendChild(res);
@@ -620,10 +763,17 @@
     $('mPuz').hidden = false;
   }
 
-  function parseNum(s) {
-    s = String(s).replace(/[−–—]/g, '-').trim();
+  function parseNum(raw) {
+    if (raw == null) return null;
+    var rawStr = String(raw).replace(/[−–—]/g, '-');
+    if (rawStr === ' ' || rawStr === '_' || rawStr === '␣') {
+      return 0; // Spasi bernilai 0
+    }
+    var s = rawStr.trim();
+    if (s === '') return null;
+    if (s === '0' || /^spasi$/i.test(s) || s === 'space') return 0;
     if (!/^-?\d+$/.test(s)) {
-      if (s.length === 1 && ((s >= 'A' && s <= 'Z') || (s >= 'a' && s <= 'z') || s === ' ')) {
+      if (s.length === 1 && ((s >= 'A' && s <= 'Z') || (s >= 'a' && s <= 'z'))) {
         return val(s);
       }
       return null;
@@ -729,7 +879,7 @@
         ['Noah', 'Semua tenang! Jangan ada yang menyentuh TKP. Pelakunya pasti masih ada di dalam villa ini.'],
         function () { S.harin = { x: 295 }; S.sari = S.harin; },
         ['Harin', 'Pak Noah... Saya menemukan secarik kertas ini di bawah cangkir teh Pak Basuki...', 'terpejam'],
-        ['Harin', 'Pak Basuki pernah mengajari saya bahwa angka-angka ini adalah pesan rahasia yang dikunci dengan rumus fungsi matematika: f(x) = 5x − 1!'],
+        ['Harin', 'Pak Basuki pernah mengajari saya bahwa angka-angka ini adalah pesan rahasia yang dikunci dengan rumus fungsi matematika: ' + (PUZ.p1 ? PUZ.p1.rulePlain : 'f(x) = 5x − 1') + '!'],
         ['Noah', 'Kertas ini kunci penyelidikan kita. Biar kubongkar pesan ini dengan fungsi inversnya!']
       ], function () {
         openPuz('p1');
@@ -750,10 +900,13 @@
         ['Noah', 'Lihat ini... Jejak sepatu pantofel basah bertanah merah mengarah ke kotak perkakas.'],
         ['', 'Di dalam drum minyak tua, terdapat abu sisa pembakaran kertas laporan audit keuangan MJC.'],
         ['Noah', 'Pelaku membakar bukti kejahatan keuangannya di sini! Dan... apa ini di bawah peti?'],
-        function () { addEv('B10'); },
+        function () {
+          if (PUZ.p2 && EVD.B10) EVD.B10[1] = 'Kartu sandi fungsi komposisi tersembunyi di gudang: ' + PUZ.p2.rule + '.';
+          addEv('B10');
+        },
         ['', 'Sebuah kartu rahasia kedua bersimbol Bunga Mawar Dua Kelopak terselip di balik tumpukan peti!'],
-        ['Noah', 'Ini sandi dua lapis... f(x) = 5x − 1 lalu ditimpa g(x) = 2x − 3. Fungsi Komposisi!'],
-        ['Noah', 'Pelaku mengunci rahasianya dengan matematika berlapis. Kita harus membalikkan fungsi komposisinya!']
+        ['Noah', 'Ini sandi dua lapis... ' + (PUZ.p2 ? PUZ.p2.fRule + ' lalu ditimpa ' + PUZ.p2.gRule : 'f(x) lalu ditimpa g(x)') + '. Fungsi Komposisi!'],
+        ['Noah', 'Pelaku mengunci rahasianya dengan matematika berlapis. Kita harus membalikkan fungsi komposisinya: ' + (PUZ.p2 ? PUZ.p2.invRule : '') + '!']
       ], function () {
         openPuz('p2');
       });

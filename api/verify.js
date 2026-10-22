@@ -42,17 +42,37 @@ module.exports = function handler(req, res) {
     });
   }
 
-  // Verifikasi Sandi Teka-Teki Matematika (p1 & p2)
+  // Verifikasi Sandi Teka-Teki Matematika (p1 & p2) - Multi-varian dinamis
   var normalized = (body.answer || '').trim().toUpperCase().replace(/\s+/g, ' ');
   var isCorrect = false;
   var solutionText = null;
 
+  var P1_SOLUTIONS = {
+    'PELAKU ADA DI GUDANG': 'Pelaku Ada Di Gudang',
+    'PERIKSA GUDANG BELAKANG': 'Periksa Gudang Belakang',
+    'BUKTI ADA DI GUDANG': 'Bukti Ada Di Gudang',
+    'CARI PETUNJUK DI GUDANG': 'Cari Petunjuk Di Gudang'
+  };
+
+  var P2_SOLUTIONS = {
+    'JAM DINDING BOHONG': 'Jam Dinding Bohong',
+    'WAKTU KEMATIAN PALSU': 'Waktu Kematian Palsu',
+    'ALIBI JAM DINDING PALSU': 'Alibi Jam Dinding Palsu',
+    'JAM MUSIK DIREKAYASA': 'Jam Musik Direkayasa',
+    'JAM MUSIK BOHONG': 'Jam Dinding Bohong',
+    'JAM DINDING': 'Jam Dinding Bohong'
+  };
+
   if (targetId === 'p1') {
-    isCorrect = normalized === 'PELAKU ADA DI GUDANG';
-    solutionText = 'Pelaku Ada Di Gudang';
+    if (P1_SOLUTIONS[normalized]) {
+      isCorrect = true;
+      solutionText = P1_SOLUTIONS[normalized];
+    }
   } else if (targetId === 'p2') {
-    isCorrect = normalized === 'JAM DINDING BOHONG' || normalized === 'JAM MUSIK BOHONG' || normalized === 'JAM DINDING';
-    solutionText = 'Jam Dinding Bohong';
+    if (P2_SOLUTIONS[normalized]) {
+      isCorrect = true;
+      solutionText = P2_SOLUTIONS[normalized];
+    }
   }
 
   return res.status(200).json({
