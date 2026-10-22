@@ -380,6 +380,28 @@
     }
   };
 
+  /* ---------- bukti & catatan ---------- */
+  var EVD = {
+    B1: ['Interkom dari pos jaga', 'Pukul 21.00 dan 21.14 Dimas menelepon lewat interkom kabel dari pos jaga.'],
+    B2: ['Jam dinding Ruang Musik', 'Jam retak dan jarum berhenti di angka 21.45. Waktu ini dicurigai sebagai rekayasa pelaku.'],
+    B3: ['Pecahan kaca di atas darah', 'Kaca jam berdiri pecah di atas genangan darah yang sudah mengental. Pembunuhan terjadi sebelum kaca dipecahkan.'],
+    B5: ['Arang laporan audit di gudang', 'Sisa kertas terbakar di drum minyak gudang memuat tulisan “Audit MJC”. Laporan keuangan sengaja dihanguskan.'],
+    B6: ['Memo audit Pak Basuki', 'Pak Basuki mencatat adanya pengeluaran fiktif vendor MJC yang disetujui Jake.'],
+    B7: ['Jejak pantofel lumpur merah', 'Jejak sepatu bersol halus dengan lumpur tanah merah dari halaman belakang menuju gudang.'],
+    B8: ['Pantofel Jake bernoda merah', 'Jake memakai sandal rumah, sedangkan sepatu pantofelnya disembunyikan dengan sol tanah merah.'],
+    B10: ['Kartu Bunga Dua Kelopak', 'Kartu sandi fungsi komposisi tersembunyi di gudang: (g∘f)(x) = 10x − 5.']
+  };
+
+  function applyCulpritClues() {
+    if (!EVD) return;
+    var cKey = S && S.culprit ? S.culprit : 'jake';
+    var cData = CULPRIT_DATA[cKey] || CULPRIT_DATA.jake;
+    EVD.B5 = [cData.ashClueTitle, cData.ashClueDesc];
+    EVD.B6 = [cData.memoClueTitle, cData.memoClueDesc];
+    EVD.B7 = [cData.shoeClueTitle, cData.shoeClueDesc];
+    EVD.B8 = [cData.suspectClueTitle, cData.suspectClueDesc];
+  }
+
   /* ---------- state ---------- */
   var S;
   function newState() {
@@ -397,28 +419,6 @@
     } catch (e) {}
   }
   newState();
-
-  /* ---------- bukti & catatan ---------- */
-  var EVD = {
-    B1: ['Interkom dari pos jaga', 'Pukul 21.00 dan 21.14 Dimas menelepon lewat interkom kabel dari pos jaga.'],
-    B2: ['Jam dinding Ruang Musik', 'Jam retak dan jarum berhenti di angka 21.45. Waktu ini dicurigai sebagai rekayasa pelaku.'],
-    B3: ['Pecahan kaca di atas darah', 'Kaca jam berdiri pecah di atas genangan darah yang sudah mengental. Pembunuhan terjadi sebelum kaca dipecahkan.'],
-    B5: ['Arang laporan audit di gudang', 'Sisa kertas terbakar di drum minyak gudang memuat tulisan “Audit MJC”. Laporan keuangan sengaja dihanguskan.'],
-    B6: ['Memo audit Pak Basuki', 'Pak Basuki mencatat adanya pengeluaran fiktif vendor MJC yang disetujui Jake.'],
-    B7: ['Jejak pantofel lumpur merah', 'Jejak sepatu bersol halus dengan lumpur tanah merah dari halaman belakang menuju gudang.'],
-    B8: ['Pantofel Jake bernoda merah', 'Jake memakai sandal rumah, sedangkan sepatu pantofelnya disembunyikan dengan sol tanah merah.'],
-    B10: ['Kartu Bunga Dua Kelopak', 'Kartu sandi fungsi komposisi tersembunyi di gudang: (g∘f)(x) = 10x − 5.']
-  };
-
-  function applyCulpritClues() {
-    var cKey = S && S.culprit ? S.culprit : 'jake';
-    var cData = CULPRIT_DATA[cKey] || CULPRIT_DATA.jake;
-    EVD.B5 = [cData.ashClueTitle, cData.ashClueDesc];
-    EVD.B6 = [cData.memoClueTitle, cData.memoClueDesc];
-    EVD.B7 = [cData.shoeClueTitle, cData.shoeClueDesc];
-    EVD.B8 = [cData.suspectClueTitle, cData.suspectClueDesc];
-  }
-  applyCulpritClues();
   var EVIMG = {
     B1: 'interkom_menyala', B2: 'jam_musik_retak_2145', B3: 'kaca_pecah_di_atas_darah',
     B5: 'arang_kertas_mjc', B6: 'map_audit_mjc', B7: 'jejak_pantofel_lumpur',
