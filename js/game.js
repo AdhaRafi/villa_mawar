@@ -39,9 +39,9 @@
     },
     p2: {
       title: 'Teka-Teki Sandi 2: Kartu Bunga Dua Kelopak',
-      targetHash: 'f402508b5cea629404e38ca7009eabc706c2c5d971f1a55909b18dccdaf68bbd',
-      cipher: [95, -15, -135, -5, 125, -215, -195, -95, -115, -5, 15, -155, -85, -155, -145, -75],
-      spaces: [3, 9],
+      targetHash: 'e1aae1b326135b2b682e6cd7b35efb648e14b82faa6c5cecf41490f9456397da',
+      cipher: [95, -15, -135, -5, 35, -95, -145, -45, -95, -145, -75, -5, 15, -155, -85, -155, -145, -75],
+      spaces: [3, 11],
       fn: GF,
       img: 'p_kartu_sandi_2_dua_kelopak_x3',
       rule: 'y = (g∘f)(x) = 2(5x − 1) − 3 = 10x − 5',
@@ -347,9 +347,9 @@
 
   /* ---------- brankas kriptografi kalkulator (AES-256-GCM + PBKDF2) ---------- */
   var CALC_VAULT = {
-    salt: 'I/p/6qwbtH+ROT4Ur5eKig==',
-    iv: 'O+Y73dvT/KZQOaBX',
-    data: 'BLPynvh712j6oVuRPY7n/MgC0tRcKvujXtObSEdGeOTaCW9gCssh2+ltS6fXu1UH0rJoyOKnCiJ1FxwO8t84EMLz3/kBcp2dqg==',
+    salt: 'lIfbtqHQxMW0f85DhNqLTg==',
+    iv: 'cPqRHsOUc0xGOpvS',
+    data: 'mC63G6JUydFejjAENGtHlqXxUmFNnp7MS0/Jk7EDqjaV8aFOKnnQvF36MICDd8/VrwQw5w==',
     iter: 250000
   };
 
@@ -367,10 +367,11 @@
   async function verifyCalcPassword(pwd) {
     if (!window.crypto || !window.crypto.subtle) return false;
     try {
+      var norm = (pwd || '').trim().toLowerCase().replace(/\s+/g, ' ');
       var enc = new TextEncoder();
       var pwKey = await window.crypto.subtle.importKey(
         'raw',
-        enc.encode(pwd),
+        enc.encode(norm),
         { name: 'PBKDF2' },
         false,
         ['deriveKey']
