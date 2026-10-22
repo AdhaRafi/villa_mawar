@@ -252,16 +252,149 @@
       !$('mEnd').hidden;
   }
 
+  /* ---------- katalog variasi pelaku & motif dinamis ---------- */
+  var CULPRITS = ['jake', 'dimas', 'yuna'];
+  var CULPRIT_DATA = {
+    jake: {
+      name: 'Jake',
+      role: 'Direktur Keuangan Mawar Karya',
+      ashClueTitle: 'Arang laporan audit di gudang',
+      ashClueDesc: 'Sisa kertas terbakar di drum minyak gudang memuat tulisan “Audit MJC”. Laporan keuangan sengaja dihanguskan.',
+      ashNarrative: 'Di dalam drum minyak tua, terdapat abu sisa pembakaran kertas laporan audit keuangan MJC.',
+      shoeClueTitle: 'Jejak pantofel lumpur merah',
+      shoeClueDesc: 'Jejak sepatu bersol halus dengan lumpur tanah merah dari halaman belakang menuju gudang.',
+      shoeNarrative: 'Lihat ini... Jejak sepatu pantofel basah bertanah merah mengarah ke kotak perkakas.',
+      suspectClueTitle: 'Pantofel Jake bernoda merah',
+      suspectClueDesc: 'Jake memakai sandal rumah, sedangkan sepatu pantofelnya disembunyikan dengan sol tanah merah.',
+      memoClueTitle: 'Memo audit Pak Basuki',
+      memoClueDesc: 'Pak Basuki mencatat adanya pengeluaran fiktif vendor MJC yang disetujui Jake.',
+      confessionLines: [
+        ['Noah', 'Pelakunya adalah Anda, Jake!'],
+        ['Jake', 'Apa buktimu?! Aku berada di aula dan kamarku sepanjang malam!', 'terkejut'],
+        ['Noah', 'Jam musik dimajukan ke 21.45 agar kau tampak punya alibi. Padahal saat Harin ke gudang pukul 21.15, kau sudah di sana membakar buku audit!'],
+        ['Noah', 'Dan tanah merah di sol pantofel hitammu... hanya ada di halaman belakang dekat gudang tempat bukti dibakar!'],
+        ['Jake', 'Cukup... Cukup! Basuki tahu soal dana fiktif vendor MJC dan hendak melaporkanku pagi ini... Aku tak punya pilihan!', 'terpejam']
+      ],
+      defenseLinesJake: [
+        ['Noah', 'Pelakunya adalah Anda, Jake!'],
+        ['Jake', 'Bukan aku! Periksa kembali jejak sol sepatu di gudang!']
+      ],
+      defenseLinesDimas: [
+        ['Noah', 'Dimas, apa kau pelakunya?'],
+        ['Dimas', 'Pak Detektif, kabel interkom membuktikan saya di pos saat 21.00 dan 21.14! Dan sol sepatu saya bot bergerigi, bukan sol pantofel halus!'],
+        ['Noah', 'Tunggu... Dimas benar. Sol sepatu di gudang adalah pantofel halus milik Jake, dan orang yang punya motif audit keuangan adalah Jake!']
+      ],
+      defenseLinesYuna: [
+        ['Noah', 'Yuna, apa kau membunuh pamanmu karena sengketa villa?'],
+        ['Yuna', 'Saya memang marah soal villa, tapi saya tidak tahu menahu soal pembakaran kertas audit keuangan di gudang! Sepatu saya kets putih!', 'terkejut'],
+        ['Noah', 'Benar... pembunuh sebenarnya berkepentingan menghilangkan audit keuangan MJC dan memakai pantofel hitam berlumur tanah merah: Jake!']
+      ],
+      winDesc: [
+        'Dengan pemecahan Sandi Mawar (Fungsi Invers dan Komposisi), Noah membongkar rekayasa waktu jam dinding dan alibi palsu Jake.',
+        'Jake ditangkap saat polisi tiba di pagi hari. Penggelapan dana fiktif MJC terungkap, dan Villa Mawar diselamatkan.',
+        'Harin tersenyum lega. Pelajaran matematika dari Pak Basuki kini menjadi penyelamat kebenaran.'
+      ],
+      failDesc: 'Pelaku sebenarnya (Jake) memanfaatkan situasi untuk melarikan diri saat jalan dibuka.'
+    },
+    dimas: {
+      name: 'Dimas',
+      role: 'Penjaga Pos Jaga Villa',
+      ashClueTitle: 'Arang surat pemecatan & utang',
+      ashClueDesc: 'Sisa kertas terbakar di drum minyak memuat tulisan “Peringatan Kas & Tagihan Utang”. Bukti motif Dimas.',
+      ashNarrative: 'Di dalam drum minyak tua, terdapat abu sisa kertas pemecatan Dimas dan surat tagihan utang rentenir.',
+      shoeClueTitle: 'Jejak bot karet bergerigi lumpur',
+      shoeClueDesc: 'Jejak sol sepatu bot karet bergerigi tebal berlumur tanah merah dari pos menuju gudang.',
+      shoeNarrative: 'Lihat ini... Jejak sol sepatu bot karet bergerigi tebal berlumur lumpur merah mengarah ke kotak perkakas.',
+      suspectClueTitle: 'Bot karet Dimas bernoda merah',
+      suspectClueDesc: 'Sepatu bot bergerigi Dimas basah dan bernoda tanah merah, disembunyikan di balik karung genset.',
+      memoClueTitle: 'Buku mutasi kas pos jaga',
+      memoClueDesc: 'Pak Basuki mencatat pembongkaran brankas kas pos jaga dan ancaman pemecatan untuk Dimas.',
+      confessionLines: [
+        ['Noah', 'Pelakunya adalah Anda, Dimas!'],
+        ['Dimas', 'Fitnah! Saya menelepon lewat interkom kabel dari pos jaga jam 21.00 dan 21.14!', 'terkejut'],
+        ['Noah', 'Panggilan interkom itu hanya rekaman yang kau setel di kabel loop! Jam dinding kau majukan ke 21.45 untuk merekayasa alibi!'],
+        ['Noah', 'Dan tapak bergerigi di gudang persis sol bot karetmu yang berlumur tanah merah di balik karung genset!'],
+        ['Dimas', 'Pak Basuki mau memenjarakanku karena kas pos... dan menolak pinjaman utang rentenirku... Aku gelap mata!', 'terpejam']
+      ],
+      defenseLinesJake: [
+        ['Noah', 'Jake, apa kau pelakunya?'],
+        ['Jake', 'Detektif, pantofelku bersol halus dan bersih! Jejak di gudang adalah tapak bot karet bergerigi milik Dimas!'],
+        ['Noah', 'Tunggu... Jake benar. Jejak sol sepatu di gudang adalah bot karet bergerigi milik penjaga pos: Dimas!']
+      ],
+      defenseLinesDimas: [
+        ['Noah', 'Dimas, apa kau pelakunya?'],
+        ['Dimas', 'Bukan saya!']
+      ],
+      defenseLinesYuna: [
+        ['Noah', 'Yuna, apa kau membunuh pamanmu?'],
+        ['Yuna', 'Detektif, sepatu saya kets putih wanita ukuran 37! Jejak tapak bot bergerigi di gudang itu ukuran 43 milik Dimas!'],
+        ['Noah', 'Benar... jejak kaki di gudang berukuran besar dan bertapak bot bergerigi milik Dimas si penjaga pos!']
+      ],
+      winDesc: [
+        'Dengan pemecahan Sandi Mawar (Fungsi Invers dan Komposisi), Noah membongkar alibi rekaman interkom dan rekayasa waktu Dimas.',
+        'Dimas mengakui perbuatannya dan menyerahkan kunci brankas. Pembunuhan berhasil diungkap secara tuntas.',
+        'Harin tersenyum lega. Pelajaran matematika dari Pak Basuki kini menjadi penyelamat kebenaran.'
+      ],
+      failDesc: 'Pelaku sebenarnya (Dimas) memanfaatkan kekeliruan tuduhan untuk kabur menyelinap lewat pagar belakang.'
+    },
+    yuna: {
+      name: 'Yuna',
+      role: 'Keponakan Korban',
+      ashClueTitle: 'Arang draf revisi surat wasiat',
+      ashClueDesc: 'Sisa kertas terbakar di drum minyak gudang memuat tulisan “Akta Hibah Yayasan”. Yuna dicoret dari ahli waris villa.',
+      ashNarrative: 'Di dalam drum minyak tua, terdapat sisa lembaran draf akta hibah Villa Mawar ke yayasan yang sengaja dibakar.',
+      shoeClueTitle: 'Jejak sepatu kets lumpur merah',
+      shoeClueDesc: 'Jejak sol sepatu kets ramping wanita berukuran kecil dengan tanah merah dari halaman belakang menuju gudang.',
+      shoeNarrative: 'Lihat ini... Jejak sol sepatu kets ramping wanita bertanah merah mengarah ke kotak perkakas.',
+      suspectClueTitle: 'Sepatu kets Yuna bernoda merah',
+      suspectClueDesc: 'Sepatu kets putih Yuna tersembunyi di bawah tempat tidur lorong kamar dengan noda tanah merah di tumitnya.',
+      memoClueTitle: 'Draf surat wasiat Pak Basuki',
+      memoClueDesc: 'Pak Basuki berencana mewakafkan seluruh aset Villa Mawar ke yayasan panti asuhan, mencoret nama Yuna.',
+      confessionLines: [
+        ['Noah', 'Pelakunya adalah Anda, Yuna!'],
+        ['Yuna', 'Mustahil! Aku sudah tertidur di kamarku sejak jam 21.00 malam!', 'terkejut'],
+        ['Noah', 'Kau merusak jam dinding ke 21.45 agar waktu kematian tampak saat kau punya alibi tidur! Padahal pamanmu kau bunuh sebelum jam sembilan!'],
+        ['Noah', 'Lalu kau ke gudang membakar draf revisi wasiat! Dan sol kets putihmu bernoda tanah merah yang tak bisa kau sangkal!'],
+        ['Yuna', 'Paman tidak berhak memberikan villa peninggalan ibuku kepada orang lain! Villa ini milik darah keluargaku!', 'terpejam']
+      ],
+      defenseLinesJake: [
+        ['Noah', 'Jake, apa kau membunuh Basuki demi audit keuangan?'],
+        ['Jake', 'Detektif, periksa abu kertas itu! Yang dibakar bukan auditku, tapi surat wasiat! Dan jejaknya kets ramping wanita, bukan pantofelku!'],
+        ['Noah', 'Tunggu... Jake benar. Kertas yang terbakar adalah draf wasiat notaris dan jejaknya adalah kets wanita milik Yuna!']
+      ],
+      defenseLinesDimas: [
+        ['Noah', 'Dimas, apa kau pelakunya?'],
+        ['Dimas', 'Pak Detektif, ukuran jejak kets di gudang jauh lebih kecil dari bot saya! Dan yang dibakar adalah surat warisan villa!'],
+        ['Noah', 'Benar... Dimas tidak ada sangkut paut dengan surat wasiat. Pelaku sebenarnya yang memakai kets wanita adalah Yuna!']
+      ],
+      defenseLinesYuna: [
+        ['Noah', 'Yuna, apa kau pelakunya?'],
+        ['Yuna', 'Bukan saya!']
+      ],
+      winDesc: [
+        'Dengan pemecahan Sandi Mawar (Fungsi Invers dan Komposisi), Noah membongkar rekayasa waktu kematian dan motif sengketa warisan Yuna.',
+        'Yuna ditahan polisi saat pagi tiba. Villa Mawar diserahkan ke yayasan sesuai wasiat mendiang Pak Basuki.',
+        'Harin tersenyum lega. Pelajaran matematika dari Pak Basuki kini menjadi penyelamat kebenaran.'
+      ],
+      failDesc: 'Pelaku sebenarnya (Yuna) memanfaatkan tuduhan keliru detektif untuk menghapus jejak dan melarikan diri.'
+    }
+  };
+
   /* ---------- state ---------- */
   var S;
   function newState() {
+    var randomCulprit = CULPRITS[Math.floor(Math.random() * CULPRITS.length)];
     S = {
       room: 'aula', x: 110, face: 1, f: {}, ev: {}, time: '--.--',
       fade: 0, flash: 0, flashT: 5, t: 0, started: false,
       spk: null, noteT: 0, harin: null, sari: null, callOn: false,
-      memory: false, dawn: false, ending: null
+      memory: false, dawn: false, ending: null, culprit: randomCulprit
     };
     initRandomPuzzles();
+    applyCulpritClues();
+    try {
+      console.log('[Villa Mawar] Pelaku sesi ini:', S.culprit);
+    } catch (e) {}
   }
   newState();
 
@@ -276,6 +409,16 @@
     B8: ['Pantofel Jake bernoda merah', 'Jake memakai sandal rumah, sedangkan sepatu pantofelnya disembunyikan dengan sol tanah merah.'],
     B10: ['Kartu Bunga Dua Kelopak', 'Kartu sandi fungsi komposisi tersembunyi di gudang: (g∘f)(x) = 10x − 5.']
   };
+
+  function applyCulpritClues() {
+    var cKey = S && S.culprit ? S.culprit : 'jake';
+    var cData = CULPRIT_DATA[cKey] || CULPRIT_DATA.jake;
+    EVD.B5 = [cData.ashClueTitle, cData.ashClueDesc];
+    EVD.B6 = [cData.memoClueTitle, cData.memoClueDesc];
+    EVD.B7 = [cData.shoeClueTitle, cData.shoeClueDesc];
+    EVD.B8 = [cData.suspectClueTitle, cData.suspectClueDesc];
+  }
+  applyCulpritClues();
   var EVIMG = {
     B1: 'interkom_menyala', B2: 'jam_musik_retak_2145', B3: 'kaca_pecah_di_atas_darah',
     B5: 'arang_kertas_mjc', B6: 'map_audit_mjc', B7: 'jejak_pantofel_lumpur',
@@ -1017,6 +1160,18 @@
       toast('⚡ Kalkulator terbuka!');
     });
   };
+  window.setCulprit = function (name) {
+    if (CULPRIT_DATA[name]) {
+      S.culprit = name;
+      applyCulpritClues();
+      toast('Pelaku diubah ke: ' + CULPRIT_DATA[name].name);
+      return 'Pelaku aktif: ' + name;
+    }
+    return 'Pilihan: jake | dimas | yuna';
+  };
+  window.getCulprit = function () {
+    return S ? S.culprit : null;
+  };
 
   /* ---------- alur cerita bertingkat (visual novel MTK) ---------- */
   function setTime(t) { S.time = t; updHud(); }
@@ -1065,6 +1220,7 @@
   // Bab 2: Gudang Belakang & Sandi Dua Kelopak
   function afterP1(decodedMsg) {
     var teksSolusi = decodedMsg || 'Pesan Rahasia';
+    var cData = CULPRIT_DATA[S.culprit] || CULPRIT_DATA.jake;
     showChapter(4, function () {
       setTime('23.10'); S.f.p1 = true;
       S.room = 'gudang'; S.x = 160; S.harin = null; S.sari = null;
@@ -1072,9 +1228,9 @@
       say([
         ['Noah', 'Pesan Sandi 1 terpecahkan: “' + teksSolusi + '”. Si pembuat pesan ingin kita memeriksa gudang belakang!'],
         ['', 'Noah menyelinap ke gudang di belakang dapur. Hujan masih menderu di luar kaca jendela.'],
-        ['Noah', 'Lihat ini... Jejak sepatu pantofel basah bertanah merah mengarah ke kotak perkakas.'],
-        ['', 'Di dalam drum minyak tua, terdapat abu sisa pembakaran kertas laporan audit keuangan MJC.'],
-        ['Noah', 'Pelaku membakar bukti kejahatan keuangannya di sini! Dan... apa ini di bawah peti?'],
+        ['Noah', cData.shoeNarrative],
+        ['', cData.ashNarrative],
+        ['Noah', 'Pelaku membakar bukti kejahatannya di sini! Dan... apa ini di bawah peti?'],
         function () {
           if (PUZ.p2 && EVD.B10) EVD.B10[1] = 'Kartu sandi fungsi komposisi tersembunyi di gudang: ' + PUZ.p2.rule + '.';
           addEv('B10');
@@ -1091,6 +1247,7 @@
   // Bab 3: Fajar Menyingsing, Konfrontasi & Tuduhan Akhir
   function afterP2(decodedMsg) {
     var teksSolusi = decodedMsg || 'Pesan Rahasia';
+    var cData = CULPRIT_DATA[S.culprit] || CULPRIT_DATA.jake;
     showChapter(6, function () {
       setTime('05.30'); S.dawn = true; S.room = 'musik'; S.x = 90;
       addEv('B8'); addEv('B6');
@@ -1100,41 +1257,30 @@
         ['', 'Fajar mulai menyingsing di jendela Ruang Musik. Seluruh penghuni villa dikumpulkan.'],
         ['Jake', 'Sudah pagi, Detektif. Badai sudah reda dan jalan mulai dibuka. Siapa pelaku yang kau tuduh?', 'bicara'],
         ['Yuna', 'Pasti Dimas si penjaga pos! Dia yang memegang kunci perkakas!', 'terkejut'],
-        ['Dimas', 'Demi Tuhan bukan saya! Sepatu saya bot karet bergerigi, bukan pantofel mahal bertanah merah!'],
-        ['Noah', 'Semua bukti matematika sudah membuktikan siapa pelaku sebenarnya!'],
+        ['Dimas', 'Demi Tuhan bukan saya! Periksa motif dan bukti fisik di gudang sebelum menuduh!'],
+        ['Noah', 'Semua bukti matematika dan jejak di gudang sudah membuktikan siapa pelaku sebenarnya!'],
         {
           ask: {
             who: 'Noah',
-            q: 'Berdasarkan kedua hasil dekripsi sandi matematika dan motif pembakaran audit MJC, siapakah pembunuh Pak Basuki?',
+            q: 'Berdasarkan hasil dekripsi sandi matematika dan bukti di gudang, siapakah pembunuh Pak Basuki?',
             opts: [
               {
                 t: 'Jake (Direktur Keuangan Mawar Karya)',
-                lines: [
-                  ['Noah', 'Pelakunya adalah Anda, Jake!'],
-                  ['Jake', 'Apa buktimu?! Aku berada di aula dan kamarku sepanjang malam!', 'terkejut'],
-                  ['Noah', 'Jam musik dimajukan ke 21.45 agar kau tampak punya alibi. Padahal saat Harin ke gudang pukul 21.15, kau sudah di sana membakar buku audit!'],
-                  ['Noah', 'Dan tanah merah di sol pantofel hitammu... hanya ada di halaman belakang dekat gudang tempat surat Pak Basuki ditemukan!'],
-                  ['Jake', 'Cukup... Cukup! Basuki tahu soal dana fiktif vendor MJC dan hendak melaporkanku pagi ini... Aku tak punya pilihan!', 'terpejam'],
-                  function () { ending('win', 'Jake'); }
-                ]
+                lines: (S.culprit === 'jake' ?
+                  cData.confessionLines.concat([function () { ending('win', 'Jake'); }]) :
+                  cData.defenseLinesJake.concat([function () { ending('weak', 'Jake'); }]))
               },
               {
                 t: 'Dimas (Penjaga Pos Jaga)',
-                lines: [
-                  ['Noah', 'Dimas, apa kau pelakunya?'],
-                  ['Dimas', 'Pak Detektif, kabel interkom membuktikan saya di pos saat 21.00 dan 21.14! Dan sol sepatu saya bot bergerigi, bukan sol pantofel halus!'],
-                  ['Noah', 'Tunggu... Dimas benar. Sol sepatu di gudang adalah pantofel halus milik Jake, dan orang yang punya motif audit keuangan adalah Jake!'],
-                  function () { ending('weak', 'Dimas'); }
-                ]
+                lines: (S.culprit === 'dimas' ?
+                  cData.confessionLines.concat([function () { ending('win', 'Dimas'); }]) :
+                  cData.defenseLinesDimas.concat([function () { ending('weak', 'Dimas'); }]))
               },
               {
                 t: 'Yuna (Keponakan Korban)',
-                lines: [
-                  ['Noah', 'Yuna, apa kau membunuh pamanmu karena sengketa villa?'],
-                  ['Yuna', 'Saya memang marah soal villa, tapi saya tidak tahu menahu soal pembakaran kertas audit keuangan di gudang! Sepatu saya kets putih!', 'terkejut'],
-                  ['Noah', 'Benar... pembunuh sebenarnya berkepentingan menghilangkan audit keuangan MJC dan memakai pantofel hitam berlumur tanah merah: Jake!'],
-                  function () { ending('wrong', 'Yuna'); }
-                ]
+                lines: (S.culprit === 'yuna' ?
+                  cData.confessionLines.concat([function () { ending('win', 'Yuna'); }]) :
+                  cData.defenseLinesYuna.concat([function () { ending('wrong', 'Yuna'); }]))
               }
             ]
           }
@@ -1153,14 +1299,13 @@
   function ending(kind, who) {
     S.ending = kind; dlg.Q = []; dlg.active = false; setDlgIdle();
     var c = $('endCard'), E = ENDS[kind] || ENDS.win, body = [];
+    var cData = CULPRIT_DATA[S.culprit] || CULPRIT_DATA.jake;
 
     if (kind === 'win') {
-      body.push('Dengan pemecahan Sandi Mawar (Fungsi Invers dan Komposisi), Noah membongkar rekayasa waktu jam dinding dan alibi palsu Jake.');
-      body.push('Jake ditangkap saat polisi tiba di pagi hari. Penggelapan dana fiktif MJC terungkap, dan Villa Mawar diselamatkan.');
-      body.push('Harin tersenyum lega. Pelajaran matematika dari Pak Basuki kini menjadi penyelamat kebenaran.');
+      cData.winDesc.forEach(function (t) { body.push(t); });
     } else {
-      body.push('Tuduhan Anda goyah karena mengabaikan jejak sol pantofel di gudang dan hasil dekripsi sandi kedua.');
-      body.push('Pelaku sebenarnya (Jake) memanfaatkan situasi untuk melarikan diri saat jalan dibuka.');
+      body.push('Tuduhan Anda goyah karena bukti jejak sepatu dan barang yang dibakar di gudang tidak mengarah padanya.');
+      body.push(cData.failDesc);
       body.push('Anda boleh mencoba lagi untuk menjatuhkan tuduhan yang tepat berdasarkan bukti matematika.');
     }
 
