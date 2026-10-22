@@ -371,11 +371,10 @@
       calc.className = 'calc locked';
       calc.innerHTML =
         '<div class="calc-lock-header">' +
-        '  <b>🔒 Kalkulator Terkunci (Enkripsi AES-256-GCM + PBKDF2)</b>' +
-        '  <span class="calc-lock-desc">Kalkulator otomatis dilindungi password agar mengutamakan hitung mandiri. Masukkan password otorisasi untuk membuka.</span>' +
+        '  <b>🔒 Kalkulator</b>' +
         '</div>' +
         '<div class="row calc-lock-row">' +
-        '  <input id="calcPwd" type="password" placeholder="Masukkan password otorisasi..." autocomplete="off" aria-label="Password kalkulator">' +
+        '  <input id="calcPwd" type="password" placeholder="Masukkan password..." autocomplete="off" aria-label="Password kalkulator">' +
         '  <button type="button" id="calcUnlockBtn">Buka Kunci</button>' +
         '</div>' +
         '<div class="calc-lock-msg" id="calcLockMsg"></div>';
@@ -388,25 +387,25 @@
         var pwd = pwdInp.value.trim();
         if (!pwd) {
           msg.className = 'calc-lock-msg error';
-          msg.textContent = 'Silakan ketikkan password otorisasi.';
+          msg.textContent = 'Silakan masukkan password.';
           return;
         }
         btn.disabled = true;
         btn.textContent = 'Memverifikasi...';
         msg.className = 'calc-lock-msg';
-        msg.textContent = 'Memverifikasi PBKDF2 (100.000 iterasi) & AES-256-GCM...';
+        msg.textContent = 'Memverifikasi...';
 
         var ok = await verifyCalcPassword(pwd);
         if (ok) {
           S.calcUnlocked = true;
           if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
-          toast('Otorisasi Berhasil! Kalkulator Dibuka.');
+          toast('Kalkulator terbuka!');
           renderCalc(calc, P);
         } else {
           btn.disabled = false;
           btn.textContent = 'Buka Kunci';
           msg.className = 'calc-lock-msg error';
-          msg.textContent = '❌ Akses Ditolak: Password salah atau verifikasi integritas AES-GCM gagal.';
+          msg.textContent = '❌ Password salah.';
           if (typeof GameAudio !== 'undefined') GameAudio.puzzleWrong();
           pwdInp.value = '';
           pwdInp.focus();
@@ -425,8 +424,8 @@
       calc.innerHTML =
         '<div class="calc-lock-header">' +
         '  <div style="display:flex;justify-content:space-between;align-items:center;">' +
-        '    <b>🔓 Kalkulator Fungsi Invers (Akses Terbuka)</b>' +
-        '    <button type="button" id="calcRelockBtn" style="min-height:26px;padding:2px 8px;font-size:11px;">Kunci Kembali</button>' +
+        '    <b>🔓 Kalkulator</b>' +
+        '    <button type="button" id="calcRelockBtn" style="min-height:26px;padding:2px 8px;font-size:11px;">Kunci</button>' +
         '  </div>' +
         '</div>' +
         '<div class="row">' +
