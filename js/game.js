@@ -725,10 +725,22 @@
           if (nextChip) nextChip.focus();
         } else if (e.key === 'Enter') {
           var nextInp = cip.querySelector('.chip[data-i="' + (i + 1) + '"] input');
-          if (nextInp) nextInp.focus();
+          if (nextInp) {
+            nextInp.focus();
+          } else {
+            verifyAllPuz();
+          }
         }
       });
     });
+
+    var act = document.createElement('div');
+    act.className = 'puz-actions';
+    act.innerHTML =
+      '<button type="button" class="primary" id="btnCheckPuz">🔍 Periksa Pesan Sandi</button>' +
+      '<div class="puz-status" id="puzStatus"></div>';
+    c.appendChild(act);
+    act.querySelector('#btnCheckPuz').addEventListener('click', verifyAllPuz);
 
     var res = document.createElement('div'); res.id = 'puzRes'; c.appendChild(res);
 
@@ -782,63 +794,105 @@
   }
 
   function chk(chip, i) {
-    var P = curP.P, inp = chip.querySelector('input'), x = parseNum(inp.value), ch = chip.querySelector('.ch'), vf = chip.querySelector('.vf');
-    chip.classList.remove('ok', 'bad'); ch.textContent = ''; vf.textContent = '';
-    if (x === null) {
-      if (inp.value.trim()) {
-        chip.classList.add('bad');
-        if (typeof GameAudio !== 'undefined') GameAudio.puzzleWrong();
-      }
-      finishCheck();
-      return;
+    var inp = chip.querySelector('input'), x = parseNum(inp.value), ch = chip.querySelector('.ch');
+    chip.classList.remove('ok', 'bad');
+    ch.textContent = '';
+    if (x !== null && Math.abs(x) <= 26) {
+      ch.textContent = x === 0 ? '␣' : chr(x);
     }
-    var okv = P.fn(x) === curP.cipher[i];
-    if (Math.abs(x) <= 26) ch.textContent = x === 0 ? '␣' : chr(x);
-    chip.classList.add(okv ? 'ok' : 'bad');
-    if (typeof GameAudio !== 'undefined') {
-      if (okv) GameAudio.puzzleCorrect();
-      else GameAudio.puzzleWrong();
+    var statusEl = $('puzStatus');
+    if (statusEl && statusEl.classList.contains('error')) {
+      statusEl.textContent = '';
+      statusEl.className = 'puz-status';
     }
-    vf.textContent = '→' + P.fn(x);
-    finishCheck();
   }
 
-  async function finishCheck() {
+  async function verifyAllPuz() {
     if (curP.solved) return;
-    var chips = document.querySelectorAll('#cipher .chip'), all = true;
-    Array.prototype.forEach.call(chips, function (c) { if (!c.classList.contains('ok')) all = false; });
-    if (all) {
-      // Rekonstruksi pesan teks dari karakter yang dipecahkan
-      var decoded = Array.from(chips).map(function (c) {
-        var inp = c.querySelector('input');
-        var valX = parseNum(inp ? inp.value : '');
-        return valX === 0 ? ' ' : (valX !== null ? chr(valX) : '');
-      }).join('');
+    var chips = document.querySelectorAll('#cipher .chip');
+    var statusEl = $('puzStatus');
+    var emptyCount = 0;
+    var allMathCorrect = true;
 
-      var h = await hashText(decoded);
-      var serverCheck = await verifyViaServer(curP.id, { answer: decoded });
-      var isVerified = false;
-
-      if (serverCheck !== null) {
-        isVerified = serverCheck.success === true;
+    var decodedArr = [];
+    Array.prototype.forEach.call(chips, function (c, idx) {
+      var inp = c.querySelector('input');
+      var valX = parseNum(inp ? inp.value : '');
+      if (valX === null) {
+        emptyCount++;
       } else {
-        isVerified = h === curP.P.targetHash;
+        if (curP.P.fn(valX) !== curP.cipher[idx]) {
+          allMathCorrect = false;
+        }
+        decodedArr.push(valX === 0 ? ' ' : chr(valX));
       }
+    });
 
-      if (isVerified) {
-        curP.solved = true;
-        if (typeof GameAudio !== 'undefined') GameAudio.puzzleSolved();
-        var r = $('puzRes'); r.className = 'solved';
-        var displayText = (serverCheck && serverCheck.text) ? serverCheck.text : decoded;
-        r.innerHTML = '<div class="muted">Pesan Rahasia Berhasil Dipecahkan!</div><div class="msg">“' + displayText + '”</div>';
-        var b = document.createElement('button'); b.type = 'button'; b.className = 'primary'; b.textContent = 'Lanjutkan Penyelidikan ▸'; b.style.marginTop = '10px';
-        b.addEventListener('click', function () {
-          $('mPuz').hidden = true;
-          var id = curP.id;
-          if (id === 'p1') afterP1(displayText);
-          else afterP2(displayText);
-        });
-        r.appendChild(b);
+    if (emptyCount > 0) {
+      if (statusEl) {
+        statusEl.className = 'puz-status warn';
+        statusEl.textContent = '⚠️ Masih ada ' + emptyCount + ' kotak yang belum diisi. Lengkapi seluruh huruf!';
+      }
+      if (typeof GameAudio !== 'undefined') GameAudio.clickUI();
+      return;
+    }
+
+    var decoded = decodedArr.join('');
+    var btnCheck = $('btnCheckPuz');
+    if (btnCheck) {
+      btnCheck.disabled = true;
+      btnCheck.textContent = 'Memverifikasi...';
+    }
+
+    var h = await hashText(decoded);
+    var serverCheck = await verifyViaServer(curP.id, { answer: decoded });
+    var isVerified = false;
+
+    if (serverCheck !== null) {
+      isVerified = serverCheck.success === true;
+    } else {
+      isVerified = (h === curP.P.targetHash) && allMathCorrect;
+    }
+
+    if (isVerified) {
+      curP.solved = true;
+      if (typeof GameAudio !== 'undefined') GameAudio.puzzleSolved();
+      Array.prototype.forEach.call(chips, function (c) {
+        c.classList.remove('bad');
+        c.classList.add('ok');
+      });
+      if (statusEl) {
+        statusEl.className = 'puz-status ok';
+        statusEl.textContent = '✅ Pesan berhasil didekripsi dengan benar!';
+      }
+      if (btnCheck) btnCheck.style.display = 'none';
+
+      var r = $('puzRes'); r.className = 'solved';
+      var displayText = (serverCheck && serverCheck.text) ? serverCheck.text : decoded;
+      r.innerHTML = '<div class="muted">Pesan Rahasia Berhasil Dipecahkan!</div><div class="msg">“' + displayText + '”</div>';
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'primary'; b.textContent = 'Lanjutkan Penyelidikan ▸'; b.style.marginTop = '10px';
+      b.addEventListener('click', function () {
+        $('mPuz').hidden = true;
+        var id = curP.id;
+        if (id === 'p1') afterP1(displayText);
+        else afterP2(displayText);
+      });
+      r.appendChild(b);
+    } else {
+      if (btnCheck) {
+        btnCheck.disabled = false;
+        btnCheck.textContent = '🔍 Periksa Pesan Sandi';
+      }
+      if (typeof GameAudio !== 'undefined') GameAudio.puzzleWrong();
+      if (statusEl) {
+        statusEl.className = 'puz-status error';
+        statusEl.textContent = '❌ Pesan belum tepat! Periksa kembali hasil perhitungan rumus invers Anda.';
+      }
+      var cip = $('cipher');
+      if (cip) {
+        cip.classList.remove('shake');
+        void cip.offsetWidth;
+        cip.classList.add('shake');
       }
     }
   }
