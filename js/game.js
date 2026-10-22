@@ -683,8 +683,8 @@
         b.addEventListener('click', function () {
           $('mPuz').hidden = true;
           var id = curP.id;
-          if (id === 'p1') afterP1();
-          else afterP2();
+          if (id === 'p1') afterP1(displayText);
+          else afterP2(displayText);
         });
         r.appendChild(b);
       }
@@ -736,13 +736,14 @@
   }
 
   // Bab 2: Gudang Belakang & Sandi Dua Kelopak
-  function afterP1() {
+  function afterP1(decodedMsg) {
+    var teksSolusi = decodedMsg || 'Pesan Rahasia';
     showChapter(4, function () {
       setTime('23.10'); S.f.p1 = true;
       S.room = 'gudang'; S.x = 160; S.harin = null; S.sari = null;
       addEv('B7'); addEv('B5');
       say([
-        ['Noah', 'Pesan Sandi 1 terpecahkan: “Pelaku Ada Di Gudang”. Si pembuat pesan ingin kita memeriksa gudang belakang!'],
+        ['Noah', 'Pesan Sandi 1 terpecahkan: “' + teksSolusi + '”. Si pembuat pesan ingin kita memeriksa gudang belakang!'],
         ['', 'Noah menyelinap ke gudang di belakang dapur. Hujan masih menderu di luar kaca jendela.'],
         ['Noah', 'Lihat ini... Jejak sepatu pantofel basah bertanah merah mengarah ke kotak perkakas.'],
         ['', 'Di dalam drum minyak tua, terdapat abu sisa pembakaran kertas laporan audit keuangan MJC.'],
@@ -758,12 +759,13 @@
   }
 
   // Bab 3: Fajar Menyingsing, Konfrontasi & Tuduhan Akhir
-  function afterP2() {
+  function afterP2(decodedMsg) {
+    var teksSolusi = decodedMsg || 'Pesan Rahasia';
     showChapter(6, function () {
       setTime('05.30'); S.dawn = true; S.room = 'musik'; S.x = 90;
       addEv('B8'); addEv('B6');
       say([
-        ['Noah', 'Pesan Sandi 2 terpecahkan: “Jam Musik Bohong”!!'],
+        ['Noah', 'Pesan Sandi 2 terpecahkan: “' + teksSolusi + '”!!'],
         ['Noah', 'Jam dinding antik sengaja dimajukan ke 21.45 dan dirusak untuk memalsukan alibi! Pak Basuki tewas jauh sebelum jam sembilan lewat seperempat!'],
         ['', 'Fajar mulai menyingsing di jendela Ruang Musik. Seluruh penghuni villa dikumpulkan.'],
         ['Jake', 'Sudah pagi, Detektif. Badai sudah reda dan jalan mulai dibuka. Siapa pelaku yang kau tuduh?', 'bicara'],
@@ -773,7 +775,7 @@
         {
           ask: {
             who: 'Noah',
-            q: 'Berdasarkan Sandi 1 (Pelaku di Gudang), Sandi 2 (Jam Musik Bohong), dan motif pembakaran audit MJC, siapakah pembunuh Pak Basuki?',
+            q: 'Berdasarkan kedua hasil dekripsi sandi matematika dan motif pembakaran audit MJC, siapakah pembunuh Pak Basuki?',
             opts: [
               {
                 t: 'Jake (Direktur Keuangan Mawar Karya)',
@@ -827,7 +829,7 @@
       body.push('Jake ditangkap saat polisi tiba di pagi hari. Penggelapan dana fiktif MJC terungkap, dan Villa Mawar diselamatkan.');
       body.push('Harin tersenyum lega. Pelajaran matematika dari Pak Basuki kini menjadi penyelamat kebenaran.');
     } else {
-      body.push('Tuduhan Anda goyah karena mengabaikan jejak sol pantofel di gudang dan hasil dekripsi Sandi 2: “Jam Musik Bohong”.');
+      body.push('Tuduhan Anda goyah karena mengabaikan jejak sol pantofel di gudang dan hasil dekripsi sandi kedua.');
       body.push('Pelaku sebenarnya (Jake) memanfaatkan situasi untuk melarikan diri saat jalan dibuka.');
       body.push('Anda boleh mencoba lagi untuk menjatuhkan tuduhan yang tepat berdasarkan bukti matematika.');
     }
