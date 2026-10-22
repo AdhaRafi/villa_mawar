@@ -13,6 +13,7 @@ const GameAudio = (function () {
   var musicGain = null;
   var isMuted = false;
   var isRunning = false;
+  var isBackgrounded = false;
   var stepTime = 0;
   var musicInterval = null;
   var rainPatterInterval = null;
@@ -99,7 +100,7 @@ const GameAudio = (function () {
     // Rintik acak tetesan air di jendela (patter)
     if (rainPatterInterval) clearInterval(rainPatterInterval);
     rainPatterInterval = setInterval(function () {
-      if (!actx || isMuted || !isRunning) return;
+      if (!actx || isMuted || !isRunning || isBackgrounded) return;
       if (Math.random() > 0.45) return;
       var now = actx.currentTime;
       var osc = actx.createOscillator();
@@ -148,7 +149,7 @@ const GameAudio = (function () {
     var stepIdx = 0;
 
     function playProgression() {
-      if (!actx || isMuted) return;
+      if (!actx || isMuted || isBackgrounded) return;
       var now = actx.currentTime;
       var cur = progressions[stepIdx % progressions.length];
       stepIdx++;
@@ -637,6 +638,59 @@ const GameAudio = (function () {
       testChime();
     }
     return !isMuted;
+  }
+
+  // Otomatis jeda dan senyapkan audio saat tab diminimalkan, kunci layar HP, atau pindah aplikasi
+  function pauseAudio() {
+    isBackgrounded = true;
+    if (actx) {
+      if (masterGain) {
+        masterGain.gain.setValueAtTime(0, actx.currentTime);
+      }
+      if (actx.state === 'running') {
+        actx.suspend().catch(function () {});
+      }
+    }
+  }
+
+  function resumeAudio() {
+    isBackgrounded = false;
+    if (actx && isRunning && !isMuted) {
+      if (actx.state === 'suspended') {
+        actx.resume().then(function () {
+          if (masterGain && !isMuted && !isBackgrounded) {
+            masterGain.gain.setValueAtTime(1.0, actx.currentTime);
+          }
+        }).catch(function () {});
+      } else if (masterGain) {
+        masterGain.gain.setValueAtTime(1.0, actx.currentTime);
+      }
+    }
+  }
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden || document.visibilityState === 'hidden') {
+        pauseAudio();
+      } else {
+        resumeAudio();
+      }
+    });
+  }
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('pagehide', pauseAudio);
+    window.addEventListener('blur', function () {
+      if (document.hidden || document.visibilityState === 'hidden') {
+        pauseAudio();
+      }
+    });
+    window.addEventListener('pageshow', resumeAudio);
+    window.addEventListener('focus', function () {
+      if (!document.hidden && document.visibilityState === 'visible') {
+        resumeAudio();
+      }
+    });
   }
 
   return {

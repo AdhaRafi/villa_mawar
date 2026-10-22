@@ -631,25 +631,19 @@
   var _lockoutUntil = 0;
   var _lockoutTimer = null;
 
-  var _devAuthorized = false;
   try {
-    _devAuthorized = sessionStorage.getItem('villa_dev_auth') === 'true';
+    sessionStorage.removeItem('villa_dev_auth');
+    localStorage.removeItem('villa_dev_auth');
   } catch (e) {}
 
   function ensureDevAuth(cb) {
-    if (_devAuthorized) {
-      cb();
-      return;
-    }
     var entered = window.prompt('🔐 Fitur Khusus Pembuat / Guru\nMasukkan password akses pembuat:');
     if (!entered) return;
     var norm = entered.trim().toLowerCase();
     var valids = ['guru123', 'admin', 'mawar', 'rahasia', 'villamawar', '1234'];
     if (valids.indexOf(norm) !== -1) {
-      _devAuthorized = true;
-      try { sessionStorage.setItem('villa_dev_auth', 'true'); } catch (e) {}
       if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
-      toast('✅ Akses pembuat terverifikasi!');
+      toast('✅ Password benar! Memproses instan...');
       cb();
     } else {
       if (typeof GameAudio !== 'undefined') GameAudio.puzzleWrong();
