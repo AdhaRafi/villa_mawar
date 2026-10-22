@@ -563,10 +563,10 @@
     var p = document.createElement('div'); p.className = 'formula-box';
     p.innerHTML =
       '<div class="formula-line">' +
-      '  <span class="formula-item">Rumus Enkripsi: <b class="f-code">' + P.rule + '</b></span>' +
-      '  <span class="formula-item">Rumus Invers: <b class="f-code highlight">' + P.invRule + '</b></span>' +
+      '  <span class="formula-item">Fungsi Enkripsi (Kunci): <b class="f-code">' + P.rule + '</b></span>' +
+      '  <span class="formula-item">Fungsi Dekripsi (Invers): <b class="f-code highlight">' + P.invRule + '</b></span>' +
       '</div>' +
-      '<div class="formula-sub">Hitung nilai <b>x</b> dari setiap angka <b>y</b> di bawah menggunakan rumus invers, lalu susun pesannya!</div>';
+      '<div class="formula-sub">Gunakan fungsi invers untuk mendeskripsikan <b>cipherteks (y)</b> menjadi <b>plainteks (x)</b>, lalu susun pesannya!</div>';
     c.appendChild(p);
 
     var cip = document.createElement('div'); cip.className = 'cipher'; cip.id = 'cipher'; c.appendChild(cip);
@@ -594,13 +594,14 @@
     c.appendChild(calc);
     renderCalc(calc, P);
 
-    // Tabel Abjad Sandi Mawar
-    var d = document.createElement('details'); d.innerHTML = '<summary>Buka Tabel Sandi Mawar (Nilai Tiap Abjad)</summary>';
-    var tw = document.createElement('div'); tw.className = 'mapwrap'; var tb = '<table class="map"><tr>';
+    // Tabel Kuantifikasi Huruf (Sesuai Materi Kriptografi)
+    var d = document.createElement('details'); d.innerHTML = '<summary>Buka Tabel Kuantifikasi Huruf (Acuan Konversi)</summary>';
+    var tw = document.createElement('div'); tw.className = 'mapwrap';
+    var tb = '<div style="font-weight:600;margin-bottom:4px;color:var(--amber)">Kuantifikasi Huruf Kapital (Positif):</div><table class="map"><tr>';
     for (var a = 1; a <= 26; a++) tb += '<td>' + String.fromCharCode(64 + a) + '<br>' + a + '</td>';
-    tb += '</tr><tr>';
+    tb += '</tr></table><div style="font-weight:600;margin:8px 0 4px;color:var(--teal)">Kuantifikasi Huruf Kecil (Negatif):</div><table class="map"><tr>';
     for (a = 1; a <= 26; a++) tb += '<td>' + String.fromCharCode(96 + a) + '<br>−' + a + '</td>';
-    tb += '</tr></table><p class="muted" style="margin-top:6px">Huruf Kapital = Positif, Huruf Kecil = Negatif, Spasi = 0</p>';
+    tb += '</tr></table><p class="muted" style="margin-top:6px">Kuantifikasi: Huruf Kapital = Positif (+1 s/d +26) · Huruf Kecil = Negatif (−1 s/d −26) · Spasi = 0</p>';
     tw.innerHTML = tb; d.appendChild(tw); c.appendChild(d);
 
     var hint = document.createElement('div'); hint.id = 'hintBox'; hint.className = 'muted';
@@ -907,24 +908,25 @@
   $('bHelp').addEventListener('click', function () {
     if (!$('mHelp').hidden) { $('mHelp').hidden = true; return; }
     var c = $('helpCard');
-    c.innerHTML = '<h2>Panduan Matematika: Sandi Mawar</h2>' +
+    c.innerHTML = '<h2>Panduan Materi: Kriptografi & Komposisi Fungsi</h2>' +
       '<div class="list">' +
-      '<p><b>1. Konsep Huruf ke Angka (Sandi Mawar):</b><br>' +
+      '<p><b>1. Tabel Kuantifikasi Huruf (Acuan Konversi):</b><br>' +
       '• Huruf Kapital (A–Z) = Angka positif <b>1 s/d 26</b> (A=1, B=2, ..., Z=26)<br>' +
       '• Huruf Kecil (a–z) = Angka negatif <b>−1 s/d −26</b> (a=−1, b=−2, ..., z=−26)<br>' +
       '• Spasi antarkata = Angka <b>0</b></p>' +
-      '<p><b>2. Sandi 1: Fungsi Invers f⁻¹(y):</b><br>' +
-      '• Rumus Enkripsi: y = f(x) = 5x − 1<br>' +
-      '• Rumus Pembalik (Invers): <b>x = (y + 1) / 5</b><br>' +
-      '• <i>Contoh:</i> Angka 79 → (79 + 1)/5 = 16 (Huruf P kapital).</p>' +
-      '<p><b>3. Sandi 2: Fungsi Komposisi & Invers (g∘f)⁻¹(y):</b><br>' +
-      '• Lapis 1: f(x) = 5x − 1, Lapis 2: g(x) = 2x − 3<br>' +
-      '• Digabung: (g∘f)(x) = 2(5x − 1) − 3 = 10x − 5<br>' +
-      '• Rumus Pembalik (Invers): <b>x = (y + 5) / 10</b><br>' +
-      '• <i>Contoh:</i> Angka 95 → (95 + 5)/10 = 10 (Huruf J kapital).</p>' +
-      '<p><b>4. Tips Praktis:</b><br>' +
-      '• Menu <b>Kalkulator sandi</b> dilindungi password enkripsi AES-256-GCM agar pemain terlatih menghitung mandiri.<br>' +
-      '• Anda juga bisa langsung mengetik <b>hurufnya langsung</b> pada kotak teka-teki!</p>' +
+      '<p><b>2. Sandi 1: Enkripsi Linear & Fungsi Dekripsi/Invers f⁻¹(y):</b><br>' +
+      '• Fungsi Enkripsi (Kunci): y = f(x) = 5x − 1<br>' +
+      '• Fungsi Dekripsi (Invers): <b>x = (y + 1) / 5</b><br>' +
+      '• <i>Contoh:</i> Cipherteks 79 → x = (79 + 1)/5 = 16 (Plainteks: Huruf P kapital).</p>' +
+      '<p><b>3. Sandi 2: Enkripsi Ganda (Komposisi Fungsi) & Invers (g∘f)⁻¹(y):</b><br>' +
+      '• <i>Konsep:</i> Agar tingkat keamanan pesan berlipat ganda, enkripsi menggunakan komposisi fungsi.<br>' +
+      '• Fungsi 1: f(x) = 5x − 1, Fungsi 2: g(x) = 2x − 3<br>' +
+      '• Komposisi: (g∘f)(x) = 2(5x − 1) − 3 = 10x − 5<br>' +
+      '• Fungsi Dekripsi (Invers Komposisi): <b>x = (y + 5) / 10</b><br>' +
+      '• <i>Contoh:</i> Cipherteks 95 → x = (95 + 5)/10 = 10 (Plainteks: Huruf J kapital).</p>' +
+      '<p><b>4. Tips & Catatan:</b><br>' +
+      '• Menu <b>Kalkulator sandi</b> dilindungi password agar pemain terlatih menghitung mandiri secara manual.<br>' +
+      '• Anda bisa mengetik angka <b>x</b> atau langsung mengetik <b>hurufnya</b> pada kotak teka-teki!</p>' +
       '</div>' +
       '<div class="row"><button type="button" id="hx">Tutup</button></div>';
     $('mHelp').hidden = false;
