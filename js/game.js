@@ -247,6 +247,7 @@
   function isModalOpen() {
     return !$('mTitle').hidden ||
       !$('mHelp').hidden ||
+      !$('mQR').hidden ||
       !$('mNote').hidden ||
       !$('mPuz').hidden ||
       !$('mEnd').hidden;
@@ -1399,6 +1400,27 @@
     $('mHelp').hidden = false;
     $('hx').addEventListener('click', function () { $('mHelp').hidden = true; });
   });
+
+  function openQR() {
+    var c = $('qrCard');
+    c.innerHTML = '<h2>📱 Scan QR Code untuk Main di HP</h2>' +
+      '<div style="display:flex;flex-direction:column;align-items:center;margin:12px 0;">' +
+      '  <div style="background:#fff;padding:12px;border-radius:12px;border:3px solid var(--amber);box-shadow:0 6px 20px rgba(0,0,0,0.5);">' +
+      '    <img src="assets/qr_villa_mawar.png" alt="QR Code Villa Mawar" style="width:230px;height:230px;display:block;image-rendering:pixelated;">' +
+      '  </div>' +
+      '  <div style="margin-top:12px;font-family:var(--f-mono);font-size:15px;color:var(--teal);font-weight:600;">https://villamawar.vercel.app</div>' +
+      '  <p class="muted" style="margin-top:6px;text-align:center;font-size:13px;">Buka kamera smartphone dan arahkan ke QR Code di atas.</p>' +
+      '</div>' +
+      '<div class="row"><button type="button" class="primary" id="qrx">Tutup</button></div>';
+    $('mQR').hidden = false;
+    var qrx = $('qrx');
+    if (qrx) qrx.addEventListener('click', function () { $('mQR').hidden = true; });
+  }
+
+  var bQR = $('bQR');
+  if (bQR) bQR.addEventListener('click', openQR);
+  var bTitleQR = $('bTitleQR');
+  if (bTitleQR) bTitleQR.addEventListener('click', openQR);
 
   /* ---------- hud & bab banner ---------- */
   var _lastHud = '';
