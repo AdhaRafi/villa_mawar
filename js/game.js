@@ -250,6 +250,8 @@
       !$('mQR').hidden ||
       !$('mNote').hidden ||
       !$('mPuz').hidden ||
+      !$('mAch').hidden ||
+      !$('mCert').hidden ||
       !$('mEnd').hidden;
   }
 
@@ -433,6 +435,9 @@
     if (EVD[id]) toast('Petunjuk baru: ' + EVD[id][0], evSrc(id));
     updNote();
     if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
+    if (Object.keys(S.ev).length >= 8) {
+      unlockAchievement('ach_all_clues');
+    }
   }
   function updNote() { $('nEv').textContent = Object.keys(S.ev).length; }
 
@@ -444,6 +449,143 @@
     e.classList.add('on');
     clearTimeout(tt);
     tt = setTimeout(function () { e.classList.remove('on'); }, 2800);
+  }
+
+  /* ---------- sistem prestasi & lencana detektif (persistent) ---------- */
+  var ACH_STORAGE_KEY = 'villa_achievements';
+  var ACHIEVEMENTS = {
+    ach_start: {
+      id: 'ach_start',
+      icon: '🕵️‍♂️',
+      title: 'Langkah Pertama',
+      desc: 'Memulai investigasi malam badai di Villa Mawar.',
+      cat: 'Awal Kasus'
+    },
+    ach_sandi1: {
+      id: 'ach_sandi1',
+      icon: '🧮',
+      title: 'Ahli Invers Linear',
+      desc: 'Memecahkan Sandi 1: Fungsi Invers f⁻¹(y) = (y + 1) / 5.',
+      cat: 'Kriptografi'
+    },
+    ach_calc: {
+      id: 'ach_calc',
+      icon: '🕰️',
+      title: 'Pembongkar Brankas',
+      desc: 'Membuka kalkulator invers rahasia jam dinding.',
+      cat: 'Eksplorasi'
+    },
+    ach_all_clues: {
+      id: 'ach_all_clues',
+      icon: '🔍',
+      title: 'Mata Elang',
+      desc: 'Mengumpulkan seluruh bukti fisik dan catatan kasus.',
+      cat: 'Deduksi'
+    },
+    ach_sandi2: {
+      id: 'ach_sandi2',
+      icon: '🔐',
+      title: 'Pakar Komposisi',
+      desc: 'Memecahkan Sandi 2: Invers Komposisi (g∘f)⁻¹(y) = (y + 5) / 10.',
+      cat: 'Kriptografi'
+    },
+    ach_win: {
+      id: 'ach_win',
+      icon: '🏆',
+      title: 'Detektif Mawar Sejati',
+      desc: 'Menuntaskan kasus Villa Mawar dengan tuduhan yang tepat.',
+      cat: 'Kemenangan'
+    },
+    ach_pure: {
+      id: 'ach_pure',
+      icon: '⭐',
+      title: 'Deduksi Murni',
+      desc: 'Menjatuhkan tuduhan yang benar tanpa pernah salah menuduh.',
+      cat: 'Keahlian'
+    },
+    ach_win_jake: {
+      id: 'ach_win_jake',
+      icon: '🎭',
+      title: 'Skandal Terbongkar',
+      desc: 'Membongkar konspirasi penggelapan dana dan menangkap Jake.',
+      cat: 'Penangkapan'
+    },
+    ach_win_dimas: {
+      id: 'ach_win_dimas',
+      icon: '⚡',
+      title: 'Jeratan Kabel Interkom',
+      desc: 'Membongkar alibi interkom dan menangkap Dimas si penjaga.',
+      cat: 'Penangkapan'
+    },
+    ach_win_yuna: {
+      id: 'ach_win_yuna',
+      icon: '📜',
+      title: 'Gugurnya Sengketa Wasiat',
+      desc: 'Menghentikan rencana pemalsuan wasiat dan menangkap Yuna.',
+      cat: 'Penangkapan'
+    }
+  };
+
+  function getUnlockedAchievements() {
+    try {
+      var raw = localStorage.getItem(ACH_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveUnlockedAchievements(data) {
+    try {
+      localStorage.setItem(ACH_STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  var _achToastTimer = null;
+  function showAchToast(def) {
+    var el = $('achToast');
+    if (!el) return;
+    el.innerHTML =
+      '<div class="ach-toast-icon">' + (def.icon || '🏆') + '</div>' +
+      '<div class="ach-toast-body">' +
+      '  <span class="ach-toast-kicker">PRESTASI TERBUKA!</span>' +
+      '  <div class="ach-toast-title">' + def.title + '</div>' +
+      '  <div class="ach-toast-desc">' + def.desc + '</div>' +
+      '</div>';
+    el.hidden = false;
+    el.classList.add('on');
+    clearTimeout(_achToastTimer);
+    _achToastTimer = setTimeout(function () {
+      el.classList.remove('on');
+      setTimeout(function () {
+        if (!el.classList.contains('on')) el.hidden = true;
+      }, 400);
+    }, 4500);
+  }
+
+  function unlockAchievement(id) {
+    var def = ACHIEVEMENTS[id];
+    if (!def) return;
+    var unlocked = getUnlockedAchievements();
+    if (unlocked[id]) return;
+
+    unlocked[id] = {
+      unlockedAt: new Date().toISOString()
+    };
+    saveUnlockedAchievements(unlocked);
+    updAchBadge();
+    showAchToast(def);
+    if (typeof GameAudio !== 'undefined') {
+      GameAudio.puzzleSolved();
+    }
+  }
+
+  function updAchBadge() {
+    var unlocked = getUnlockedAchievements();
+    var count = Object.keys(unlocked).length;
+    var total = Object.keys(ACHIEVEMENTS).length;
+    var el = $('nAch');
+    if (el) el.textContent = count + '/' + total;
   }
 
   /* ---------- dialog visual novel ---------- */
@@ -588,6 +730,9 @@
       if (!$('mNote').hidden) closeNote();
       else if (!$('mHelp').hidden) { $('mHelp').hidden = true; }
       else if (!$('mPuz').hidden) { $('mPuz').hidden = true; }
+      else if (!$('mQR').hidden) { $('mQR').hidden = true; }
+      else if (!$('mAch').hidden) { $('mAch').hidden = true; }
+      else if (!$('mCert').hidden) { $('mCert').hidden = true; }
     }
   });
 
@@ -722,8 +867,9 @@
           e.stopPropagation();
           ensureDevAuth(function () {
             _vaultUnlocked = true;
-            _failCount = 0;
-            _lockoutUntil = 0;
+          _failCount = 0;
+          _lockoutUntil = 0;
+          unlockAchievement('ach_calc');
             clearInterval(_lockoutTimer);
             if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
             toast('⚡ Password kalkulator terbuka!');
@@ -793,6 +939,7 @@
           _vaultUnlocked = true;
           _failCount = 0;
           _lockoutUntil = 0;
+          unlockAchievement('ach_calc');
           clearInterval(_lockoutTimer);
           if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
           toast('Kalkulator terbuka!');
@@ -1112,8 +1259,9 @@
       });
 
       _vaultUnlocked = true;
-      _failCount = 0;
-      _lockoutUntil = 0;
+          _failCount = 0;
+          _lockoutUntil = 0;
+          unlockAchievement('ach_calc');
       clearInterval(_lockoutTimer);
       var calc = document.querySelector('.calc');
       if (calc && curP && curP.P) renderCalc(calc, curP.P);
@@ -1134,6 +1282,7 @@
           _vaultUnlocked = true;
           _failCount = 0;
           _lockoutUntil = 0;
+          unlockAchievement('ach_calc');
           clearInterval(_lockoutTimer);
           var calc = document.querySelector('.calc');
           if (calc && curP && curP.P) renderCalc(calc, curP.P);
@@ -1147,8 +1296,9 @@
   window.unlockCalc = function () {
     ensureDevAuth(function () {
       _vaultUnlocked = true;
-      _failCount = 0;
-      _lockoutUntil = 0;
+          _failCount = 0;
+          _lockoutUntil = 0;
+          unlockAchievement('ach_calc');
       clearInterval(_lockoutTimer);
       var calc = document.querySelector('.calc');
       if (calc && curP && curP.P) renderCalc(calc, curP.P);
@@ -1173,6 +1323,7 @@
 
   // Bab 1: Jam Sembilan Malam & Sandi Pertama
   function intro() {
+    unlockAchievement('ach_start');
     showChapter(1, function () {
       S.started = true; S.room = 'dapur'; S.memory = true; setTime('19.00');
       say([
@@ -1214,6 +1365,7 @@
 
   // Bab 2: Gudang Belakang & Sandi Dua Kelopak
   function afterP1(decodedMsg) {
+    unlockAchievement('ach_sandi1');
     var teksSolusi = decodedMsg || 'Pesan Rahasia';
     var cData = CULPRIT_DATA[S.culprit] || CULPRIT_DATA.jake;
     showChapter(4, function () {
@@ -1241,6 +1393,7 @@
 
   // Bab 3: Fajar Menyingsing, Konfrontasi & Tuduhan Akhir
   function afterP2(decodedMsg) {
+    unlockAchievement('ach_sandi2');
     var teksSolusi = decodedMsg || 'Pesan Rahasia';
     var cData = CULPRIT_DATA[S.culprit] || CULPRIT_DATA.jake;
     showChapter(6, function () {
@@ -1298,7 +1451,13 @@
 
     if (kind === 'win') {
       cData.winDesc.forEach(function (t) { body.push(t); });
+      unlockAchievement('ach_win');
+      if (S.culprit === 'jake') unlockAchievement('ach_win_jake');
+      else if (S.culprit === 'dimas') unlockAchievement('ach_win_dimas');
+      else if (S.culprit === 'yuna') unlockAchievement('ach_win_yuna');
+      if (!S.hasWrongAccusation) unlockAchievement('ach_pure');
     } else {
+      S.hasWrongAccusation = true;
       body.push('Tuduhan Anda goyah karena bukti jejak sepatu dan barang yang dibakar di gudang tidak mengarah padanya.');
       body.push(cData.failDesc);
       body.push('Anda boleh mencoba lagi untuk menjatuhkan tuduhan yang tepat berdasarkan bukti matematika.');
@@ -1307,11 +1466,42 @@
     c.innerHTML = '<img class="hero" alt="" src="' + ASSETS[E.bg] + '">';
     var s = document.createElement('div'); s.className = 'sub'; s.textContent = E.tag; c.appendChild(s);
     var h2 = document.createElement('h2'); h2.textContent = E.t; c.appendChild(h2);
+
+    if (kind === 'win') {
+      var achBanner = document.createElement('div');
+      achBanner.className = 'end-ach-banner';
+      achBanner.innerHTML = '<div class="end-ach-icon">🏆</div><div class="end-ach-body">' +
+        '<span class="end-ach-kicker">PRESTASI TERTINGGI DIBUKA!</span>' +
+        '<div class="end-ach-title">Detektif Mawar Sejati</div>' +
+        '<div class="end-ach-desc">Selamat! Anda telah membongkar kejahatan di Villa Mawar menggunakan aljabar kriptografi fungsi invers & komposisi.</div>' +
+        '</div>';
+      c.appendChild(achBanner);
+    }
+
     var eb = document.createElement('div'); eb.className = 'list'; c.appendChild(eb);
     body.forEach(function (t) { var p = document.createElement('p'); p.textContent = t; eb.appendChild(p); });
 
     var r = document.createElement('div'); r.className = 'row';
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'primary';
+    r.style.flexWrap = 'wrap';
+    r.style.gap = '10px';
+
+    if (kind === 'win') {
+      var bCert = document.createElement('button');
+      bCert.type = 'button';
+      bCert.className = 'primary btn-cert';
+      bCert.innerHTML = '📜 Buka Sertifikat Kelulusan';
+      bCert.addEventListener('click', openCertModal);
+      r.appendChild(bCert);
+
+      var bShowAch = document.createElement('button');
+      bShowAch.type = 'button';
+      bShowAch.innerHTML = '🏆 Lihat Semua Prestasi';
+      bShowAch.addEventListener('click', openAchModal);
+      r.appendChild(bShowAch);
+    }
+
+    var b = document.createElement('button'); b.type = 'button';
+    if (kind !== 'win') b.className = 'primary';
     b.textContent = kind === 'win' ? 'Main Lagi dari Awal' : 'Ulangi Penyelidikan';
     b.addEventListener('click', restart);
     r.appendChild(b);
@@ -1326,7 +1516,7 @@
     _failCount = 0;
     _lockoutUntil = 0;
     if (_lockoutTimer) { clearInterval(_lockoutTimer); _lockoutTimer = null; }
-    newState(); updNote();
+    newState(); updNote(); updAchBadge();
     dlg.Q = []; dlg.active = false; setDlgIdle();
     intro();
   }
@@ -1421,6 +1611,159 @@
   if (bQR) bQR.addEventListener('click', openQR);
   var bTitleQR = $('bTitleQR');
   if (bTitleQR) bTitleQR.addEventListener('click', openQR);
+
+  /* ---------- sertifikat & modal prestasi ---------- */
+  function openCertModal() {
+    var c = $('certCard');
+    var cData = CULPRIT_DATA[S ? S.culprit : 'jake'] || CULPRIT_DATA.jake;
+    var culpritName = cData.name + ' (' + cData.role + ')';
+    var todayStr = new Date().toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+
+    c.innerHTML =
+      '<div class="cert-header">' +
+      '  <span class="cert-inst">Republik Indonesia · Biro Penyelidikan Kriptografi Khusus</span>' +
+      '  <div class="cert-badge-icons">🌹 ⚖️ 📜</div>' +
+      '  <h1 class="cert-main-title">SERTIFIKAT KELULUSAN DETEKTIF</h1>' +
+      '  <div class="cert-sub-reg">PIAGAM PENGHARGAAN RESMI · NO. REG: VM-MTK/' + new Date().getFullYear() + '/088</div>' +
+      '</div>' +
+      '<div class="cert-body">' +
+      '  <div class="cert-award-to">Diberikan secara resmi dan terhormat kepada:</div>' +
+      '  <input type="text" id="certStudentName" class="cert-name-input" value="Detektif Siswa" maxlength="42" placeholder="Ketik Nama Anda Di Sini...">' +
+      '  <div class="cert-name-tip">💡 Klik nama di atas untuk mengetik nama Anda sendiri sebelum mencetak atau screenshot</div>' +
+      '  <div class="cert-citation">' +
+      '    Telah berhasil menyelesaikan seluruh rangkaian penyelidikan kasus kriminal di <b>Villa Mawar</b> dengan keunggulan deduksi logika serta penguasaan Kriptografi Matematika tingkat lanjut: <b>Fungsi Invers Linear</b> <code>f⁻¹(y) = (y+1)/5</code> dan <b>Komposisi Fungsi</b> <code>(g∘f)⁻¹(y) = (y+5)/10</code>, serta sukses menangkap pelaku sebenarnya: <b>' + culpritName + '</b>.' +
+      '  </div>' +
+      '  <div class="cert-award-title-box">' +
+      '    <div class="cert-award-kicker">Predikat Kelulusan & Gelar Kehormatan:</div>' +
+      '    <div class="cert-award-rank">MASTER KRIPTOGRAFI ALJABAR & FUNGSI INVERS</div>' +
+      '  </div>' +
+      '</div>' +
+      '<div class="cert-footer">' +
+      '  <div class="cert-sig-block">' +
+      '    <div class="cert-sig-line">Noah Raka</div>' +
+      '    <div class="cert-sig-name">Detektif Senior Noah</div>' +
+      '    <div class="cert-sig-role">Kepala Tim Investigasi</div>' +
+      '  </div>' +
+      '  <div class="cert-seal">' +
+      '    <div class="cert-seal-icon">🌹</div>' +
+      '    <div class="cert-seal-txt">VILLA MAWAR<br>OFFICIAL<br>SEAL</div>' +
+      '  </div>' +
+      '  <div class="cert-sig-block">' +
+      '    <div class="cert-sig-line">Harin Sari</div>' +
+      '    <div class="cert-sig-name">Harin (Sari)</div>' +
+      '    <div class="cert-sig-role">Saksi Kunci & Pembuat Sandi</div>' +
+      '  </div>' +
+      '</div>' +
+      '<div class="cert-date-bar">Diterbitkan di Villa Mawar pada tanggal ' + todayStr + '</div>' +
+      '<div class="cert-actions">' +
+      '  <button type="button" class="primary btn-cert" id="bPrintCert">🖨️ Cetak / Simpan PDF</button>' +
+      '  <button type="button" id="bCloseCert">Tutup</button>' +
+      '</div>';
+
+    $('mCert').hidden = false;
+
+    var bPrint = $('bPrintCert');
+    if (bPrint) {
+      bPrint.addEventListener('click', function () {
+        window.print();
+      });
+    }
+    var bClose = $('bCloseCert');
+    if (bClose) {
+      bClose.addEventListener('click', function () {
+        $('mCert').hidden = true;
+      });
+    }
+  }
+
+  function openAchModal() {
+    renderAchievements();
+    $('mAch').hidden = false;
+  }
+
+  function renderAchievements() {
+    var c = $('achCard');
+    var unlocked = getUnlockedAchievements();
+    var keys = Object.keys(ACHIEVEMENTS);
+    var unlockedCount = Object.keys(unlocked).length;
+    var totalCount = keys.length;
+    var pct = Math.round((unlockedCount / totalCount) * 100);
+
+    var html = '<h2>🏆 Galeri Prestasi & Lencana Detektif</h2>' +
+      '<p class="muted">Koleksi pencapaian selama menyelidiki kasus pembunuhan di Villa Mawar. Prestasi tersimpan otomatis di browser perangkat Anda.</p>' +
+      '<div class="ach-progress-box">' +
+      '  <div class="ach-progress-head">' +
+      '    <span>Kemajuan Penyelidikan</span>' +
+      '    <b>' + unlockedCount + ' / ' + totalCount + ' Terbuka (' + pct + '%)</b>' +
+      '  </div>' +
+      '  <div class="ach-progress-bar">' +
+      '    <div class="ach-progress-fill" style="width:' + pct + '%;"></div>' +
+      '  </div>' +
+      '</div>' +
+      '<div class="ach-grid">';
+
+    keys.forEach(function (id) {
+      var item = ACHIEVEMENTS[id];
+      var isUnlocked = !!unlocked[id];
+      var dateStr = '';
+      if (isUnlocked && unlocked[id].unlockedAt) {
+        try {
+          var d = new Date(unlocked[id].unlockedAt);
+          dateStr = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        } catch (e) {}
+      }
+
+      html += '<div class="ach-item ' + (isUnlocked ? 'unlocked' : 'locked') + '">' +
+        '  <div class="ach-icon-box">' + (isUnlocked ? item.icon : '🔒') + '</div>' +
+        '  <div class="ach-detail">' +
+        '    <div class="ach-meta">' +
+        '      <span class="ach-cat">' + item.cat + '</span>' +
+        '      <span class="ach-status-badge">' + (isUnlocked ? '✓ Diraih' : 'Terkunci') + '</span>' +
+        '    </div>' +
+        '    <div class="ach-name">' + item.title + '</div>' +
+        '    <div class="ach-desc">' + item.desc + '</div>' +
+        (isUnlocked && dateStr ? '    <div class="ach-date">Dibuka: ' + dateStr + '</div>' : '') +
+        '  </div>' +
+        '</div>';
+    });
+
+    html += '</div>';
+
+    var hasWon = !!unlocked.ach_win;
+    html += '<div class="row" style="flex-wrap:wrap;gap:10px;">';
+    if (hasWon) {
+      html += '<button type="button" class="primary btn-cert" id="bAchOpenCert">📜 Buka Sertifikat Kelulusan</button>';
+    }
+    html += '<button type="button" id="bCloseAch">Tutup</button>' +
+      '</div>';
+
+    c.innerHTML = html;
+
+    var bCert = $('bAchOpenCert');
+    if (bCert) {
+      bCert.addEventListener('click', function () {
+        $('mAch').hidden = true;
+        openCertModal();
+      });
+    }
+
+    var bClose = $('bCloseAch');
+    if (bClose) {
+      bClose.addEventListener('click', function () {
+        $('mAch').hidden = true;
+      });
+    }
+  }
+
+  var bAch = $('bAch');
+  if (bAch) {
+    bAch.addEventListener('click', function () {
+      if ($('mAch').hidden) openAchModal();
+      else $('mAch').hidden = true;
+    });
+  }
 
   /* ---------- hud & bab banner ---------- */
   var _lastHud = '';
@@ -1626,6 +1969,7 @@
 
   setDlgIdle();
   updHud();
+  updAchBadge();
 
   loadAll().then(function () {
     var tImg = $('titleImg');
