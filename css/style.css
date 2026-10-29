@@ -1659,3 +1659,39 @@ details summary {
     color: #555 !important;
   }
 }
+
+/* Bad Ending Achievement Themes */
+.end-ach-banner.bad-ach {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.22) 0%, rgba(30, 15, 25, 0.85) 100%);
+  border-color: var(--rose);
+  box-shadow: 0 4px 20px rgba(225, 29, 72, 0.35);
+}
+
+.end-ach-banner.bad-ach .end-ach-icon {
+  filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.8));
+}
+
+.ach-toast.bad-toast {
+  border-color: var(--rose);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(225, 29, 72, 0.45);
+}
+
+.ach-toast.bad-toast .ach-toast-kicker {
+  color: var(--rose);
+}
+
+.ach-item.unlocked.bad-item {
+  border-color: rgba(225, 29, 72, 0.6);
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.12) 0%, rgba(15, 10, 20, 0.6) 100%);
+}
+
+.ach-item.unlocked.bad-item .ach-icon-box {
+  border-color: var(--rose);
+  box-shadow: 0 0 10px rgba(225, 29, 72, 0.35);
+}
+
+.ach-item.unlocked.bad-item .ach-status-badge {
+  background: rgba(225, 29, 72, 0.2);
+  color: var(--rose);
+  border: 1px solid rgba(225, 29, 72, 0.4);
+}

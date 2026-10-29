@@ -523,6 +523,20 @@
       title: 'Gugurnya Sengketa Wasiat',
       desc: 'Menghentikan rencana pemalsuan wasiat dan menangkap Yuna.',
       cat: 'Penangkapan'
+    },
+    ach_bad_wrong: {
+      id: 'ach_bad_wrong',
+      icon: '🥀',
+      title: 'Mawar yang Salah',
+      desc: 'Salah menuduh orang tak bersalah hingga pembunuh sebenarnya melarikan diri.',
+      cat: 'Akhir Kelam'
+    },
+    ach_bad_weak: {
+      id: 'ach_bad_weak',
+      icon: '🌧️',
+      title: 'Bukti yang Tipis',
+      desc: 'Tuduhan dimentahkan karena bukti alibi jam dan gudang belum dianalisis cermat.',
+      cat: 'Akhir Kelam'
     }
   };
 
@@ -545,10 +559,13 @@
   function showAchToast(def) {
     var el = $('achToast');
     if (!el) return;
+    var isBad = def.id && def.id.indexOf('ach_bad_') === 0;
+    if (isBad) el.classList.add('bad-toast');
+    else el.classList.remove('bad-toast');
     el.innerHTML =
       '<div class="ach-toast-icon">' + (def.icon || '🏆') + '</div>' +
       '<div class="ach-toast-body">' +
-      '  <span class="ach-toast-kicker">PRESTASI TERBUKA!</span>' +
+      '  <span class="ach-toast-kicker">' + (isBad ? 'AKHIR KELAM TERBUKA!' : 'PRESTASI TERBUKA!') + '</span>' +
       '  <div class="ach-toast-title">' + def.title + '</div>' +
       '  <div class="ach-toast-desc">' + def.desc + '</div>' +
       '</div>';
@@ -576,7 +593,11 @@
     updAchBadge();
     showAchToast(def);
     if (typeof GameAudio !== 'undefined') {
-      GameAudio.puzzleSolved();
+      if (id.indexOf('ach_bad_') === 0) {
+        GameAudio.dramaticShock();
+      } else {
+        GameAudio.puzzleSolved();
+      }
     }
   }
 
@@ -1458,6 +1479,11 @@
       if (!S.hasWrongAccusation) unlockAchievement('ach_pure');
     } else {
       S.hasWrongAccusation = true;
+      if (kind === 'wrong') {
+        unlockAchievement('ach_bad_wrong');
+      } else {
+        unlockAchievement('ach_bad_weak');
+      }
       body.push('Tuduhan Anda goyah karena bukti jejak sepatu dan barang yang dibakar di gudang tidak mengarah padanya.');
       body.push(cData.failDesc);
       body.push('Anda boleh mencoba lagi untuk menjatuhkan tuduhan yang tepat berdasarkan bukti matematika.');
@@ -1476,6 +1502,19 @@
         '<div class="end-ach-desc">Selamat! Anda telah membongkar kejahatan di Villa Mawar menggunakan aljabar kriptografi fungsi invers & komposisi.</div>' +
         '</div>';
       c.appendChild(achBanner);
+    } else {
+      var badAchId = (kind === 'wrong') ? 'ach_bad_wrong' : 'ach_bad_weak';
+      var badDef = ACHIEVEMENTS[badAchId];
+      if (badDef) {
+        var badBanner = document.createElement('div');
+        badBanner.className = 'end-ach-banner bad-ach';
+        badBanner.innerHTML = '<div class="end-ach-icon">' + badDef.icon + '</div><div class="end-ach-body">' +
+          '<span class="end-ach-kicker" style="color:var(--rose);">LENCANA AKHIR KELAM TERBUKA!</span>' +
+          '<div class="end-ach-title">' + badDef.title + '</div>' +
+          '<div class="end-ach-desc">' + badDef.desc + '</div>' +
+          '</div>';
+        c.appendChild(badBanner);
+      }
     }
 
     var eb = document.createElement('div'); eb.className = 'list'; c.appendChild(eb);
@@ -1492,13 +1531,13 @@
       bCert.innerHTML = '📜 Buka Sertifikat Kelulusan';
       bCert.addEventListener('click', openCertModal);
       r.appendChild(bCert);
-
-      var bShowAch = document.createElement('button');
-      bShowAch.type = 'button';
-      bShowAch.innerHTML = '🏆 Lihat Semua Prestasi';
-      bShowAch.addEventListener('click', openAchModal);
-      r.appendChild(bShowAch);
     }
+
+    var bShowAch = document.createElement('button');
+    bShowAch.type = 'button';
+    bShowAch.innerHTML = '🏆 Lihat Semua Prestasi';
+    bShowAch.addEventListener('click', openAchModal);
+    r.appendChild(bShowAch);
 
     var b = document.createElement('button'); b.type = 'button';
     if (kind !== 'win') b.className = 'primary';
@@ -1715,7 +1754,9 @@
         } catch (e) {}
       }
 
-      html += '<div class="ach-item ' + (isUnlocked ? 'unlocked' : 'locked') + '">' +
+      var isBad = item.id && item.id.indexOf('ach_bad_') === 0;
+      var itemClass = isUnlocked ? ('unlocked' + (isBad ? ' bad-item' : '')) : 'locked';
+      html += '<div class="ach-item ' + itemClass + '">' +
         '  <div class="ach-icon-box">' + (isUnlocked ? item.icon : '🔒') + '</div>' +
         '  <div class="ach-detail">' +
         '    <div class="ach-meta">' +
