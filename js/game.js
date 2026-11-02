@@ -818,6 +818,33 @@
     }
   }
 
+  function addDoubleTap(el, cb) {
+    if (!el) return;
+    var last = 0;
+    var lastTriggered = 0;
+    function trigger(e) {
+      var now = Date.now();
+      if (now - lastTriggered < 600) return;
+      if (now - last < 550 && now - last > 40) {
+        if (e && e.preventDefault) e.preventDefault();
+        lastTriggered = now;
+        last = 0;
+        cb();
+      } else {
+        last = now;
+      }
+    }
+    el.addEventListener('touchend', trigger);
+    el.addEventListener('click', trigger);
+    el.addEventListener('dblclick', function (e) {
+      var now = Date.now();
+      if (now - lastTriggered < 600) return;
+      if (e && e.preventDefault) e.preventDefault();
+      lastTriggered = now;
+      cb();
+    });
+  }
+
   function b64ToBuf(b64) {
     var bin = atob(b64), len = bin.length, bytes = new Uint8Array(len);
     for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
@@ -897,10 +924,13 @@
           renderCalc(calc, P);
         });
       };
-      if (instantBtn) instantBtn.addEventListener('click', doInstantCalc);
-      if (titleLock) titleLock.addEventListener('dblclick', doInstantCalc);
+      if (instantBtn) {
+        instantBtn.addEventListener('click', doInstantCalc);
+        instantBtn.addEventListener('touchend', doInstantCalc);
+      }
+      if (titleLock) addDoubleTap(titleLock, doInstantCalc);
       if (pwdInp) {
-        pwdInp.addEventListener('dblclick', function () {
+        addDoubleTap(pwdInp, function () {
           ensureDevAuth(function () {
             pwdInp.value = 'jam dinding';
             doUnlock();
@@ -1046,11 +1076,14 @@
 
     var h = document.createElement('h2');
     h.textContent = P.title;
-    h.addEventListener('dblclick', devInstantSolve);
+    addDoubleTap(h, devInstantSolve);
     c.appendChild(h);
-    var im = document.createElement('img'); im.className = 'cardimg'; im.src = ASSETS[P.img]; im.alt = 'Kartu sandi matematika'; c.appendChild(im);
+    var im = document.createElement('img'); im.className = 'cardimg'; im.src = ASSETS[P.img]; im.alt = 'Kartu sandi matematika';
+    addDoubleTap(im, devInstantSolve);
+    c.appendChild(im);
 
     var p = document.createElement('div'); p.className = 'formula-box';
+    addDoubleTap(p, devInstantSolve);
     p.innerHTML =
       '<div class="formula-line">' +
       '  <span class="formula-item">Fungsi Enkripsi (Kunci): <b class="f-code">' + P.rule + '</b></span>' +
@@ -1104,7 +1137,17 @@
       '<button type="button" id="btnDevSolve" class="stealth-dev-btn" aria-label="Akses Rahasia" tabindex="-1">🔒</button>';
     c.appendChild(act);
     act.querySelector('#btnCheckPuz').addEventListener('click', verifyAllPuz);
-    act.querySelector('#btnDevSolve').addEventListener('click', devInstantSolve);
+    var devBtn = act.querySelector('#btnDevSolve');
+    if (devBtn) {
+      devBtn.addEventListener('click', function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        devInstantSolve();
+      });
+      devBtn.addEventListener('touchend', function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        devInstantSolve();
+      });
+    }
 
     var res = document.createElement('div'); res.id = 'puzRes'; c.appendChild(res);
 

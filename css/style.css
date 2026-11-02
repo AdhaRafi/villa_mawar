@@ -519,6 +519,9 @@ canvas {
   font-size: 24px;
   line-height: 1.15;
   text-wrap: balance;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
 
 .card h3 {
@@ -644,6 +647,9 @@ canvas {
   height: auto;
   image-rendering: pixelated;
   align-self: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
 
 .formula-box {
@@ -819,25 +825,28 @@ canvas {
   border: none !important;
   box-shadow: none !important;
   color: var(--muted) !important;
-  opacity: 0.15 !important;
-  font-size: 13px !important;
+  opacity: 0.28 !important;
+  font-size: 15px !important;
   cursor: pointer !important;
-  padding: 6px 12px !important;
-  margin: 0 !important;
-  min-height: auto !important;
+  padding: 8px 14px !important;
+  margin: 2px 0 0 !important;
+  min-height: 38px !important;
+  min-width: 44px !important;
   line-height: 1 !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   transition: opacity 0.25s ease, transform 0.2s ease, color 0.25s ease !important;
   user-select: none !important;
+  -webkit-user-select: none !important;
+  touch-action: manipulation !important;
   border-radius: 4px !important;
 }
 
 .stealth-dev-btn:hover,
 .stealth-dev-btn:active,
 .stealth-dev-btn:focus {
-  opacity: 0.85 !important;
+  opacity: 0.95 !important;
   color: var(--amber) !important;
   transform: scale(1.15) !important;
   outline: none !important;
