@@ -814,19 +814,33 @@ canvas {
   animation: puzShake 0.4s ease;
 }
 
-.dev-instant-btn {
-  transition: opacity 0.2s, transform 0.15s, background-color 0.2s;
-  cursor: pointer;
+.stealth-dev-btn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--muted) !important;
+  opacity: 0.15 !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+  padding: 6px 12px !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: opacity 0.25s ease, transform 0.2s ease, color 0.25s ease !important;
+  user-select: none !important;
+  border-radius: 4px !important;
 }
 
-.dev-instant-btn:hover {
-  opacity: 1 !important;
-  transform: scale(1.02);
-  background: rgba(220, 174, 85, 0.15) !important;
-}
-
-.dev-instant-btn:active {
-  transform: scale(0.98);
+.stealth-dev-btn:hover,
+.stealth-dev-btn:active,
+.stealth-dev-btn:focus {
+  opacity: 0.85 !important;
+  color: var(--amber) !important;
+  transform: scale(1.15) !important;
+  outline: none !important;
 }
 
 .solved {

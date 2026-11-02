@@ -870,8 +870,8 @@
       calc.className = 'calc locked';
       calc.innerHTML =
         '<div class="calc-lock-header">' +
-        '  <b>🔒 Kalkulator</b>' +
-        '  <button type="button" id="calcDevInstantBtn" class="dev-instant-btn" style="background:transparent;border:1px dashed var(--teal);color:var(--teal);padding:2px 8px;font-size:11px;cursor:pointer;margin-left:8px;border-radius:3px;" title="Khusus Pembuat: Perlu Password Akses">🔒 Buka Instan</button>' +
+        '  <b id="calcTitleLock" style="cursor:default;">🔒 Kalkulator</b>' +
+        '  <button type="button" id="calcDevInstantBtn" class="stealth-dev-btn" aria-label="Akses Rahasia" tabindex="-1">🔒</button>' +
         '</div>' +
         '<div class="row calc-lock-row">' +
         '  <input id="calcPwd" type="password" placeholder="Masukkan password..." autocomplete="off" aria-label="Password kalkulator">' +
@@ -883,21 +883,22 @@
       var btn = calc.querySelector('#calcUnlockBtn');
       var msg = calc.querySelector('#calcLockMsg');
       var instantBtn = calc.querySelector('#calcDevInstantBtn');
-      if (instantBtn) {
-        instantBtn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          ensureDevAuth(function () {
-            _vaultUnlocked = true;
+      var titleLock = calc.querySelector('#calcTitleLock');
+      var doInstantCalc = function (e) {
+        if (e) e.stopPropagation();
+        ensureDevAuth(function () {
+          _vaultUnlocked = true;
           _failCount = 0;
           _lockoutUntil = 0;
           unlockAchievement('ach_calc');
-            clearInterval(_lockoutTimer);
-            if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
-            toast('⚡ Password kalkulator terbuka!');
-            renderCalc(calc, P);
-          });
+          clearInterval(_lockoutTimer);
+          if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
+          toast('⚡ Password kalkulator terbuka!');
+          renderCalc(calc, P);
         });
-      }
+      };
+      if (instantBtn) instantBtn.addEventListener('click', doInstantCalc);
+      if (titleLock) titleLock.addEventListener('dblclick', doInstantCalc);
       if (pwdInp) {
         pwdInp.addEventListener('dblclick', function () {
           ensureDevAuth(function () {
@@ -1045,8 +1046,6 @@
 
     var h = document.createElement('h2');
     h.textContent = P.title;
-    h.style.cursor = 'pointer';
-    h.title = 'Klik 2x untuk Jawab Instan (Khusus Pembuat)';
     h.addEventListener('dblclick', devInstantSolve);
     c.appendChild(h);
     var im = document.createElement('img'); im.className = 'cardimg'; im.src = ASSETS[P.img]; im.alt = 'Kartu sandi matematika'; c.appendChild(im);
@@ -1101,8 +1100,8 @@
     act.className = 'puz-actions';
     act.innerHTML =
       '<button type="button" class="primary" id="btnCheckPuz">🔍 Periksa Pesan Sandi</button>' +
-      '<button type="button" id="btnDevSolve" class="dev-instant-btn" style="background:transparent;border:1px dashed rgba(220,174,85,0.45);color:var(--amber);font-size:12px;padding:5px 12px;border-radius:4px;cursor:pointer;margin-top:2px;" title="Khusus Pembuat: Perlu Password Akses">🔒 Jawab Instan (Khusus Pembuat)</button>' +
-      '<div class="puz-status" id="puzStatus"></div>';
+      '<div class="puz-status" id="puzStatus"></div>' +
+      '<button type="button" id="btnDevSolve" class="stealth-dev-btn" aria-label="Akses Rahasia" tabindex="-1">🔒</button>';
     c.appendChild(act);
     act.querySelector('#btnCheckPuz').addEventListener('click', verifyAllPuz);
     act.querySelector('#btnDevSolve').addEventListener('click', devInstantSolve);
