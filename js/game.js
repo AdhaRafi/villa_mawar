@@ -505,9 +505,9 @@
     },
     ach_win_jake: {
       id: 'ach_win_jake',
-      icon: '🎭',
-      title: 'Skandal Terbongkar',
-      desc: 'Membongkar konspirasi penggelapan dana dan menangkap Jake.',
+      icon: '💼',
+      title: 'Jejak Audit Terungkap',
+      desc: 'Mengungkap manipulasi laporan audit keuangan dan menangkap Jake.',
       cat: 'Penangkapan'
     },
     ach_win_dimas: {
