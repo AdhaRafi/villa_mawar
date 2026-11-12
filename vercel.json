@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
+  "buildCommand": "rm -rf dist && mkdir -p dist/js dist/css && cp index.html favicon.ico favicon-16x16.png favicon-32x32.png favicon.png site.webmanifest dist/ && cp -r assets dist/ && cp css/style.css dist/css/ && cp js/*.min.js dist/js/",
+  "outputDirectory": "dist",
   "headers": [
     {
       "source": "/(.*)",
@@ -12,6 +14,10 @@
         {
           "key": "X-Frame-Options",
           "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
         }
       ]
     }

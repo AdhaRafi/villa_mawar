@@ -2,7 +2,11 @@
 // Memvalidasi jawaban teka-teki sandi dan password kalkulator di sisi server
 
 module.exports = function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  var origin = req.headers.origin || '';
+  if (origin === 'https://villamawar.vercel.app' || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -35,7 +39,7 @@ module.exports = function handler(req, res) {
   if (targetId === 'calc') {
     var inputPwd = (body.password !== undefined ? body.password : body.answer) || '';
     var normPwd = inputPwd.trim().toLowerCase().replace(/\s+/g, ' ');
-    var isCalcOk = normPwd === 'jam dinding' || normPwd === 'jamdinding' || inputPwd === 'Jakee999!!';
+    var isCalcOk = normPwd === 'jam dinding' || normPwd === 'jamdinding';
     return res.status(200).json({
       success: isCalcOk,
       verified: isCalcOk

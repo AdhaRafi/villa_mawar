@@ -12,16 +12,11 @@
   function chr(v) {
     return v === 0 ? ' ' : (v > 0 ? String.fromCharCode(64 + v) : String.fromCharCode(96 - v));
   }
-  var F = function (x) { return 5 * x - 1; };
-  var GF = function (x) { return 10 * x - 5; };
-  function enc(m, fn) {
-    return Array.from(m).map(function (c) { return fn(val(c)); });
-  }
-
   /* ---------- katalog variasi teka-teki dinamis (f(x), g(x), kalimat berganti acak) ---------- */
   var P1_VARIANTS = [
     {
-      seq: [16, -5, -12, -1, -11, -21, 0, 1, -4, -1, 0, 4, -9, 0, 7, -21, -4, -1, -14, -7],
+      cipher: [79, -26, -61, -6, -56, -106, -1, 4, -21, -6, -1, 19, -46, -1, 34, -106, -21, -6, -71, -36],
+      spaces: [6, 10, 13],
       hash: '70ae516fc15fc64ea455cb21ebeb19354c9a384b9e0b15c7a63e7b1f642c675c',
       rulePlain: 'f(x) = 5x − 1',
       rule: 'y = f(x) = 5x − 1',
@@ -32,7 +27,8 @@
       ]
     },
     {
-      seq: [16, -5, -18, -9, -11, -19, -1, 0, 7, -21, -4, -1, -14, -7, 0, 2, -5, -12, -1, -11, -1, -14, -7],
+      cipher: [50, -13, -52, -25, -31, -55, -1, 2, 23, -61, -10, -1, -40, -19, 2, 8, -13, -34, -1, -31, -1, -40, -19],
+      spaces: [7, 14],
       hash: '680723f6849f0b9d3ea95770cb9517e8c6815f28e33e83d06c28f6cbfa7e7f97',
       rulePlain: 'f(x) = 3x + 2',
       rule: 'y = f(x) = 3x + 2',
@@ -43,7 +39,8 @@
       ]
     },
     {
-      seq: [2, -21, -11, -20, -9, 0, 1, -4, -1, 0, 4, -9, 0, 7, -21, -4, -1, -14, -7],
+      cipher: [5, -87, -47, -83, -39, -3, 1, -19, -7, -3, 13, -39, -3, 25, -87, -19, -7, -59, -31],
+      spaces: [5, 9, 12],
       hash: '440416a23195f6a747677d23171d76777e8f76665bf64041876a373fba5c5632',
       rulePlain: 'f(x) = 4x − 3',
       rule: 'y = f(x) = 4x − 3',
@@ -54,7 +51,8 @@
       ]
     },
     {
-      seq: [3, -1, -18, -9, 0, 16, -5, -20, -21, -14, -10, -21, -11, 0, 4, -9, 0, 7, -21, -4, -1, -14, -7],
+      cipher: [13, 5, -29, -11, 7, 39, -3, -33, -35, -21, -13, -35, -15, 7, 15, -11, 7, 21, -35, -1, 5, -21, -7],
+      spaces: [4, 13, 16],
       hash: '88731bd9d728a7864cb3b5741d718e2b938888fa0720a039ad6813c05b3ba72e',
       rulePlain: 'f(x) = 2x + 7',
       rule: 'y = f(x) = 2x + 7',
@@ -68,7 +66,8 @@
 
   var P2_VARIANTS = [
     {
-      seq: [10, -1, -13, 0, 4, -9, -14, -4, -9, -14, -7, 0, 2, -15, -8, -15, -14, -7],
+      cipher: [95, -15, -135, -5, 35, -95, -145, -45, -95, -145, -75, -5, 15, -155, -85, -155, -145, -75],
+      spaces: [3, 11],
       hash: 'e1aae1b326135b2b682e6cd7b35efb648e14b82faa6c5cecf41490f9456397da',
       fRule: 'f(x) = 5x − 1',
       gRule: 'g(x) = 2x − 3',
@@ -82,7 +81,8 @@
       ]
     },
     {
-      seq: [23, -1, -11, -20, -21, 0, 11, -5, -13, -1, -20, -9, -1, -14, 0, 16, -1, -12, -19, -21],
+      cipher: [141, -3, -63, -117, -123, 3, 69, -27, -75, -3, -117, -51, -3, -81, 3, 99, -3, -69, -111, -123],
+      spaces: [5, 14],
       hash: '9f58f683b957d51036633bd69bef53a32f45e2ab03a826b2d4ea08ac7b677281',
       fRule: 'f(x) = 3x + 2',
       gRule: 'g(x) = 2x − 1',
@@ -96,7 +96,8 @@
       ]
     },
     {
-      seq: [1, -12, -9, -2, -9, 0, 10, -1, -13, 0, 4, -9, -14, -4, -9, -14, -7, 0, 16, -1, -12, -19, -21],
+      cipher: [7, -71, -53, -11, -53, 1, 61, -5, -77, 1, 25, -53, -83, -23, -53, -83, -41, 1, 97, -5, -71, -113, -125],
+      spaces: [5, 9, 17],
       hash: 'c1938e7db161c40f3e2a7c15f50270816f2934e1752e0a84f0befb64eea0638e',
       fRule: 'f(x) = 2x + 1',
       gRule: 'g(x) = 3x − 2',
@@ -110,7 +111,8 @@
       ]
     },
     {
-      seq: [10, -1, -13, 0, 13, -21, -19, -9, -11, 0, 4, -9, -18, -5, -11, -1, -25, -1, -19, -1],
+      cipher: [81, -7, -103, 1, 105, -167, -151, -71, -87, 1, 33, -71, -143, -39, -87, -7, -199, -7, -151, -7],
+      spaces: [3, 9],
       hash: '329ddf85f29eb27a7f6ab76e88add155903ecef79b1950d87d9bda05156ff3e5',
       fRule: 'f(x) = 4x − 1',
       gRule: 'g(x) = 2x + 3',
@@ -131,29 +133,20 @@
     var v1 = P1_VARIANTS[Math.floor(Math.random() * P1_VARIANTS.length)];
     var v2 = P2_VARIANTS[Math.floor(Math.random() * P2_VARIANTS.length)];
 
-    var p1Cipher = v1.seq.map(function (x) { return v1.fn(x); });
-    var p1Spaces = [];
-    v1.seq.forEach(function (x, i) { if (x === 0) p1Spaces.push(i); });
-
-    var p2Cipher = v2.seq.map(function (x) { return v2.fn(x); });
-    var p2Spaces = [];
-    v2.seq.forEach(function (x, i) { if (x === 0) p2Spaces.push(i); });
-
-    var firstCharX1 = v1.seq[0];
-    var firstY1 = v1.fn(firstCharX1);
+    var firstY1 = v1.cipher[0];
+    var firstCharX1 = v1.calcs[v1.calcs.length - 1].fn(firstY1);
     var firstChr1 = chr(firstCharX1);
 
-    var firstCharX2 = v2.seq[0];
-    var firstY2 = v2.fn(firstCharX2);
+    var firstY2 = v2.cipher[0];
+    var firstCharX2 = v2.calcs[v2.calcs.length - 1].fn(firstY2);
     var firstChr2 = chr(firstCharX2);
 
     PUZ = {
       p1: {
         title: 'Teka-Teki Sandi 1: Kartu di Bawah Cangkir',
         targetHash: v1.hash,
-        cipher: p1Cipher,
-        spaces: p1Spaces,
-        seq: v1.seq,
+        cipher: v1.cipher,
+        spaces: v1.spaces,
         fn: v1.fn,
         img: 'p_kartu_sandi_1_x3',
         rulePlain: v1.rulePlain,
@@ -169,9 +162,8 @@
       p2: {
         title: 'Teka-Teki Sandi 2: Kartu Bunga Dua Kelopak',
         targetHash: v2.hash,
-        cipher: p2Cipher,
-        spaces: p2Spaces,
-        seq: v2.seq,
+        cipher: v2.cipher,
+        spaces: v2.spaces,
         fn: v2.fn,
         img: 'p_kartu_sandi_2_dua_kelopak_x3',
         fRule: v2.fRule,
@@ -798,53 +790,6 @@
   var _lockoutUntil = 0;
   var _lockoutTimer = null;
 
-  try {
-    sessionStorage.removeItem('villa_dev_auth');
-    localStorage.removeItem('villa_dev_auth');
-  } catch (e) {}
-
-  function ensureDevAuth(cb) {
-    var entered = window.prompt('🔐 Fitur Khusus Pembuat / Guru\nMasukkan password akses pembuat:');
-    if (!entered) return;
-    var norm = entered.trim().toLowerCase();
-    var valids = ['guru123', 'admin', 'mawar', 'rahasia', 'villamawar', '1234'];
-    if (valids.indexOf(norm) !== -1) {
-      if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
-      toast('✅ Password benar! Memproses instan...');
-      cb();
-    } else {
-      if (typeof GameAudio !== 'undefined') GameAudio.puzzleWrong();
-      window.alert('❌ Password salah! Akses fitur instan ditolak.');
-    }
-  }
-
-  function addDoubleTap(el, cb) {
-    if (!el) return;
-    var last = 0;
-    var lastTriggered = 0;
-    function trigger(e) {
-      var now = Date.now();
-      if (now - lastTriggered < 600) return;
-      if (now - last < 550 && now - last > 40) {
-        if (e && e.preventDefault) e.preventDefault();
-        lastTriggered = now;
-        last = 0;
-        cb();
-      } else {
-        last = now;
-      }
-    }
-    el.addEventListener('touchend', trigger);
-    el.addEventListener('click', trigger);
-    el.addEventListener('dblclick', function (e) {
-      var now = Date.now();
-      if (now - lastTriggered < 600) return;
-      if (e && e.preventDefault) e.preventDefault();
-      lastTriggered = now;
-      cb();
-    });
-  }
-
   function b64ToBuf(b64) {
     var bin = atob(b64), len = bin.length, bytes = new Uint8Array(len);
     for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
@@ -897,8 +842,7 @@
       calc.className = 'calc locked';
       calc.innerHTML =
         '<div class="calc-lock-header">' +
-        '  <b id="calcTitleLock" style="cursor:default;">🔒 Kalkulator</b>' +
-        '  <button type="button" id="calcDevInstantBtn" class="stealth-dev-btn" aria-label="Akses Rahasia" tabindex="-1">🔒</button>' +
+        '  <b>🔒 Kalkulator</b>' +
         '</div>' +
         '<div class="row calc-lock-row">' +
         '  <input id="calcPwd" type="password" placeholder="Masukkan password..." autocomplete="off" aria-label="Password kalkulator">' +
@@ -909,34 +853,6 @@
       var pwdInp = calc.querySelector('#calcPwd');
       var btn = calc.querySelector('#calcUnlockBtn');
       var msg = calc.querySelector('#calcLockMsg');
-      var instantBtn = calc.querySelector('#calcDevInstantBtn');
-      var titleLock = calc.querySelector('#calcTitleLock');
-      var doInstantCalc = function (e) {
-        if (e) e.stopPropagation();
-        ensureDevAuth(function () {
-          _vaultUnlocked = true;
-          _failCount = 0;
-          _lockoutUntil = 0;
-          unlockAchievement('ach_calc');
-          clearInterval(_lockoutTimer);
-          if (typeof GameAudio !== 'undefined') GameAudio.clueFound();
-          toast('⚡ Password kalkulator terbuka!');
-          renderCalc(calc, P);
-        });
-      };
-      if (instantBtn) {
-        instantBtn.addEventListener('click', doInstantCalc);
-        instantBtn.addEventListener('touchend', doInstantCalc);
-      }
-      if (titleLock) addDoubleTap(titleLock, doInstantCalc);
-      if (pwdInp) {
-        addDoubleTap(pwdInp, function () {
-          ensureDevAuth(function () {
-            pwdInp.value = 'jam dinding';
-            doUnlock();
-          });
-        });
-      }
 
       var checkLockout = function () {
         var now = Date.now();
@@ -1076,14 +992,11 @@
 
     var h = document.createElement('h2');
     h.textContent = P.title;
-    addDoubleTap(h, devInstantSolve);
     c.appendChild(h);
     var im = document.createElement('img'); im.className = 'cardimg'; im.src = ASSETS[P.img]; im.alt = 'Kartu sandi matematika';
-    addDoubleTap(im, devInstantSolve);
     c.appendChild(im);
 
     var p = document.createElement('div'); p.className = 'formula-box';
-    addDoubleTap(p, devInstantSolve);
     p.innerHTML =
       '<div class="formula-line">' +
       '  <span class="formula-item">Fungsi Enkripsi (Kunci): <b class="f-code">' + P.rule + '</b></span>' +
@@ -1133,21 +1046,9 @@
     act.className = 'puz-actions';
     act.innerHTML =
       '<button type="button" class="primary" id="btnCheckPuz">🔍 Periksa Pesan Sandi</button>' +
-      '<div class="puz-status" id="puzStatus"></div>' +
-      '<button type="button" id="btnDevSolve" class="stealth-dev-btn" aria-label="Akses Rahasia" tabindex="-1">🔒</button>';
+      '<div class="puz-status" id="puzStatus"></div>';
     c.appendChild(act);
     act.querySelector('#btnCheckPuz').addEventListener('click', verifyAllPuz);
-    var devBtn = act.querySelector('#btnDevSolve');
-    if (devBtn) {
-      devBtn.addEventListener('click', function (e) {
-        if (e && e.preventDefault) e.preventDefault();
-        devInstantSolve();
-      });
-      devBtn.addEventListener('touchend', function (e) {
-        if (e && e.preventDefault) e.preventDefault();
-        devInstantSolve();
-      });
-    }
 
     var res = document.createElement('div'); res.id = 'puzRes'; c.appendChild(res);
 
@@ -1273,8 +1174,6 @@
         statusEl.textContent = '✅ Pesan berhasil didekripsi dengan benar!';
       }
       if (btnCheck) btnCheck.style.display = 'none';
-      var btnDev = $('btnDevSolve');
-      if (btnDev) btnDev.style.display = 'none';
 
       var r = $('puzRes'); r.className = 'solved';
       var displayText = (serverCheck && serverCheck.text) ? serverCheck.text : decoded;
@@ -1305,81 +1204,6 @@
       }
     }
   }
-
-  function devInstantSolve() {
-    ensureDevAuth(function () {
-      if (!curP || !curP.P) return;
-      var seq = curP.P.seq;
-      if (!seq) return;
-      var chips = document.querySelectorAll('#cipher .chip');
-      Array.prototype.forEach.call(chips, function (chip, idx) {
-        var inp = chip.querySelector('input');
-        var correctX = seq[idx];
-        if (inp) {
-          inp.value = correctX === 0 ? '␣' : chr(correctX);
-          chk(chip, idx);
-        }
-      });
-
-      _vaultUnlocked = true;
-          _failCount = 0;
-          _lockoutUntil = 0;
-          unlockAchievement('ach_calc');
-      clearInterval(_lockoutTimer);
-      var calc = document.querySelector('.calc');
-      if (calc && curP && curP.P) renderCalc(calc, curP.P);
-
-      toast('⚡ Jawaban terisi otomatis & password kalkulator terbuka!');
-      verifyAllPuz();
-    });
-  }
-
-  // Pintasan instan pembuat (F2, Backtick `, atau Alt+J)
-  window.addEventListener('keydown', function (e) {
-    if (e.key === 'F2' || e.key === '`' || (e.altKey && (e.key === 'j' || e.key === 'J'))) {
-      if ($('mPuz') && !$('mPuz').hidden) {
-        e.preventDefault();
-        devInstantSolve();
-      } else {
-        ensureDevAuth(function () {
-          _vaultUnlocked = true;
-          _failCount = 0;
-          _lockoutUntil = 0;
-          unlockAchievement('ach_calc');
-          clearInterval(_lockoutTimer);
-          var calc = document.querySelector('.calc');
-          if (calc && curP && curP.P) renderCalc(calc, curP.P);
-          toast('⚡ Password kalkulator terbuka!');
-        });
-      }
-    }
-  });
-
-  window.devSolve = devInstantSolve;
-  window.unlockCalc = function () {
-    ensureDevAuth(function () {
-      _vaultUnlocked = true;
-          _failCount = 0;
-          _lockoutUntil = 0;
-          unlockAchievement('ach_calc');
-      clearInterval(_lockoutTimer);
-      var calc = document.querySelector('.calc');
-      if (calc && curP && curP.P) renderCalc(calc, curP.P);
-      toast('⚡ Kalkulator terbuka!');
-    });
-  };
-  window.setCulprit = function (name) {
-    if (CULPRIT_DATA[name]) {
-      S.culprit = name;
-      applyCulpritClues();
-      toast('Pelaku diubah ke: ' + CULPRIT_DATA[name].name);
-      return 'Pelaku aktif: ' + name;
-    }
-    return 'Pilihan: jake | dimas | yuna';
-  };
-  window.getCulprit = function () {
-    return S ? S.culprit : null;
-  };
 
   /* ---------- alur cerita bertingkat (visual novel MTK) ---------- */
   function setTime(t) { S.time = t; updHud(); }
